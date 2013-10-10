@@ -1,0 +1,36 @@
+*** Authorize.net Changelog ***
+
+2013.02.12 - version 2.0.4
+ * Added compatibility for Sequential Order Numbers Pro
+
+2013.01.28 - version 2.0.3
+ * Fix for error "Tax amount is invalid"
+
+2013.01.22 - version 2.0.2
+ * Fix to send shipping information to Authorize.net if it is available
+ * Verified compatibility with WooCommerce 2.0
+
+2012.12.05 - version 2.0.1
+ * Updater
+
+2012.10.15 - version 2.0
+ * Subscriptions support postponed
+ 
+2012.06.22 - version 1.4
+ * Added approval for Response code = "4" meaning the transaction was approved, but put into manual review. 
+
+2012.02.5 - version 1.3
+ * WC 1.4 Compatibility
+ * wp_remote_post instead of curl
+ * Added woo updater
+
+2011.12.21 - version 1.2
+ * Added billing email to the Authorize.net order record in case the site owner's Authorize.net account has that field set to Required by default. 
+ 
+2011.11.16 - version 1.1
+ * Removed unused options
+ * Switched logging to be email based for added security. Old logs should be deleted - delete the 'logs' directory in the plugin folder if it exists.
+ * Logging requires test mode on
+
+2011.09.27 - version 1.0
+ * First Release

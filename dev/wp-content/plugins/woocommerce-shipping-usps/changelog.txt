@@ -1,0 +1,27 @@
+*** USPS Shipping ***
+
+2013.02.26 - version 3.1.6
+ * Updated USPS flat rates to new costs.
+
+2013.02.01 - version 3.1.5
+ * Rename flat rate boxes
+
+2013.02.01 - version 3.1.4
+ * Republic of Ireland workaround
+
+2013.01.30 - version 3.1.3
+ * Show priority flat rate before express flat rate
+ * Parcel Post -> Standard Post
+
+2013.01.30 - version 3.1.2
+ * Added flat rate medium box
+ * Saved the world from rogue d55 flat rate box
+
+2013.01.29 - version 3.1.1
+ * Fix virtual item detection
+
+2013.01.29 - version 3.1.0
+ * Broke flat rate boxes into 2 groups - express and priority. This offers 2 rates instead of one.
+
+2012.12.04 - version 3.0.0
+ * Complete rewrite using USPS's latest API's
