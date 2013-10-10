@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="icon" href="http://pureformance.com/favicon.ico" type="image/x-icon"> 
+<title>Pureformance - Coming Soon</title>
+<style type="text/css">
+		html, body {
+		    margin: 0;
+		    padding: 0;
+		    width: 100%;
+		    height: 100%;
+		}
+		body {
+			background:url(background.jpg) no-repeat top center #000;
+			font-family: 'Interstate Bold';
+		}
+		.wrapper {
+			padding-top:50px;
+			text-align:center;
+		}
+		@font-face {
+		    font-family: 'Helvetica';
+		    src: url('fonts/helveticalight-webfont.eot'); 
+			src: local('Helvetica Light'), url('fonts/helveticalight-webfont.ttf') format("truetype");
+		}
+		@font-face {
+		    font-family: 'Interstate Bold';
+			src: url('fonts/interstateboldcondensed.eot');  
+			src: url('fonts/interstateboldcondensed.ttf') format("truetype"); 
+		}
+		@font-face {
+		    font-family: 'Interstate Light';
+			src: url('fonts/interstatelightcondensed.eot');  
+			src: url('fonts/interstatelightcondensed.ttf') format("truetype"); 
+		}
+		h1 {
+			font-size: 28px;
+			color: #007ed3;
+			margin-bottom: 40px;
+			font-weight: normal;
+			text-transform: uppercase;
+		}
+		p {
+			font-family: 'Helvetica';
+			font-size: 16px;
+			line-height: 22px;
+			color: #fff;
+			margin-bottom: 40px;
+		}
+		#mc_signup {
+			height: 48px;
+			margin: 0 auto 30px;
+			width: 363px;
+		}
+		#mc_signup input.mc_input {
+			background: url(form.png) no-repeat;
+			border: 0;
+			padding: 10px 20px;
+			float: left;
+			height: 28px;
+			width: 255px;
+			color: #ababab;
+		}
+		#mc_signup_submit {
+			background: url(register.png) no-repeat;
+			border: 0;
+			float: left;
+			width: 66px;
+			height: 48px;
+			text-indent: -9999px;
+			cursor: pointer;
+		}
+		#mc_message {
+			margin-bottom: 10px;
+			color: red;
+		}
+</style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js" type="text/javascript"></script>
+<script>
+$(document).ready(function(){		
+	
+	$('#mc_signup_submit').click(function () {	
+		
+		//Get the data from all the fields
+		var email = $('input[name=email]');
+		
+		
+		//organize the data properly
+		var data = 'email=' + email.val();
+			
+		//start the ajax
+		$.ajax({
+			url: "submit.php",	
+			type: "GET",		
+			data: data,		
+			cache: false,
+			
+			success: function (html) {				
+				//if process.php returned 1/true (send mail success)
+				if (html==1) {		
+					$(':input','#contactForm').not(':button, :submit, :reset, :hidden').val('');							
+					$('#mc_message').html('Thank you for signing up..');
+					$('#mc_message').fadeIn('slow');
+					setTimeout(function() { $('#mc_message').fadeOut('slow') }, 5000);
+					
+				//if process.php returned 0/false (send mail failed)
+				} else {
+					$('#mc_message').html(html);
+					$('#mc_message').fadeIn('slow');
+				}			
+			}		
+		});
+		return false;
+	});
+});
+</script>
+</head>
+
+<body>
+<div class="wrapper">
+	<h1>Join the Early Bird List for Pureformance and<br>Be Among the First in the Know.</h1>
+	<p>Be the first to explore our beautiful site, get helpful resources, our weekly<br>
+newsletter and solutions to challenges that effect you. Plus I'll send you a<br>
+personalized thank you.<br><br>
+
+<strong>It's time to rise up. Let's do this!</strong></p>
+<div id="mc_signup">	
+	<div class="mc_form_inside">
+		
+		<div id="mc_message" class="updated">
+					</div><!-- /mc_message -->
+	<input type="email" value="" name="email" class="mc_input" id="mce-EMAIL" placeholder="email address" required>
+<!--
+<div class="mc_merge_var">
+		<label class="mc_var_label" for="mc_mv_FNAME">First Name</label>
+	<input type="text" class="mc_input" id="mc_mv_FNAME" name="mc_mv_FNAME" value="" size="18">
+</div>
+-->						
+			<input type="submit" value="Subscribe" name="subscribe" id="mc_signup_submit" class="mc_signup_submit">
+	
+	
+				
+	</div><!-- /mc_form_inside --> 
+</div>
+	<img src="logo.png" />
+</div>
+</body>
+</html>
