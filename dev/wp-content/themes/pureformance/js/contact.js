@@ -20,7 +20,7 @@ $(document).ready(function(){
 		
 		//start the ajax
 		$.ajax({
-			url: "http://pureformance.com/dev/wp-content/themes/pureformance/submitContact.php",	
+			url: "https://pureformance.com/dev/wp-content/themes/pureformance/submitContact.php",	
 			type: "GET",		
 			data: data,		
 			cache: false,

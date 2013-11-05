@@ -213,7 +213,7 @@ if(!is_home()) { ?>
 			<div class="form-row">
 				<p>Not yet a member?<br>
 We offer monthly and annual membership packages!</p>
-			<center><a href="<?php echo home_url( '/' ); ?>access-forum/" class="btn1" style="display:inline-block"><span>Join Now</span></a></center>
+			<center><a href="<?php echo home_url( '/' ); ?>membership/" class="btn1" style="display:inline-block"><span>Join Now</span></a></center>
 			</div>
 		</form>
 	</div>

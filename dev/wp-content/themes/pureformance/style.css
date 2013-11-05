@@ -32,6 +32,9 @@ h1, h2, h3, h4 { font-weight:normal; }
 
 header, footer { width: 100%; }
 
+textarea {
+    resize: none;
+}
 /*GLOBAL ********************************************************************************************************/
 * {
 	font-family: 'Helvetica', Arial, sans-serif;
@@ -184,7 +187,7 @@ input:-moz-placeholder { color:#777; }
 #header {
 	background:url(images/top-bar.png) repeat-x;
 	height:47px;
-	position:absolute;
+	position:fixed;
 	width:100%;
 	z-index:5;
 }
@@ -830,6 +833,10 @@ ul.nav-icons li input[type=text], ul.nav-icons li input[type=email] {
 .woocommerce div.product div.images img, .woocommerce #content div.product div.images img, .woocommerce-page div.product div.images img, .woocommerce-page #content div.product div.images img {
 	box-shadow: none!important;
 }
+.woocommerce div.product form.cart .button, .woocommerce #content div.product form.cart .button, .woocommerce-page div.product form.cart .button, .woocommerce-page #content div.product form.cart .button {
+	margin: 0;
+	vertical-align: top;
+}
 .main-description .right-side {
 	float:left;
 	width:490px;
@@ -845,9 +852,9 @@ ul.nav-icons li input[type=text], ul.nav-icons li input[type=email] {
 	margin-bottom:22px;
 }
 .main-description .right-side .price {
-	padding:30px 0;
+	padding:30px 0 0; 
 	height:37px;
-	border-bottom:1px dotted #cacaca;
+	/* border-bottom:1px dotted #cacaca; */
 }
 .main-description .right-side .price span.amount {
 	font-family:"Interstate Light", "Helvetica", Arial, san-serif;
@@ -1809,10 +1816,8 @@ ul.nav-icons li.active span {
 	font-size:13px;
 	line-height:18px;
 	color:#fefefe;
-	position:absolute;
-	top:35px;
-	right:20px;
-	padding-left: 10px;
+	padding: 20px 20px 0 10px;
+	font-style: normal;
 }
 .book-list .over a {
 	position:absolute;

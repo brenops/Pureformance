@@ -48,9 +48,19 @@ get_header(); ?>
                             	if($book_url == '') {
                             		echo '<div class="soon">Coming Soon</div>';
                             	} else {
-                            	?>
-                                <a href="<?=$book_url?>" class="btn1"><span>Read Now</span></a>
-                                <? } ?>
+                            		if($member_access == 1) {
+										if (!is_user_logged_in() || $_SESSION['is_subscriber']==0) //check if user is not logged in or if user is not a subscriber 
+										{
+											echo '<a href="'.get_bloginfo('url').'/membership/" class="btn1"><span>Sign Up</span></a>';
+										}
+										else
+										{
+											echo '<a href="'.$book_url.'" class="btn1" target="_blank"><span>Read Now</span></a>';
+										}
+									} else {
+										echo '<a href="'.$book_url.'" class="btn1" target="_blank"><span>Read Now</span></a>';
+									}
+                            	} ?>
                             </div>
                             <div class="over">
                                 <p><?php echo $rollover_description; ?></p>
@@ -110,9 +120,19 @@ get_header(); ?>
                             	if($book_url == '') {
                             		echo '<div class="soon">Coming Soon</div>';
                             	} else {
-                            	?>
-                                <a href="<?=$book_url?>" class="btn1"><span>Read Now</span></a>
-                                <? } ?>
+                            		if($member_access == 1) {
+										if (!is_user_logged_in() || $_SESSION['is_subscriber']==0) //check if user is not logged in or if user is not a subscriber 
+										{
+											echo '<a href="'.get_bloginfo('url').'/membership/" class="btn1"><span>Sign Up</span></a>';
+										}
+										else
+										{
+											echo '<a href="'.$book_url.'" class="btn1" target="_blank"><span>Read Now</span></a>';
+										}
+									} else {
+										echo '<a href="'.$book_url.'" class="btn1" target="_blank"><span>Read Now</span></a>';
+									}
+                            	} ?>
                             </div>
                             <div class="over">
                                 <p><?php echo $rollover_description; ?></p>
