@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 </ul>
 <div itemscope itemtype="http://schema.org/Product" id="product-<?php the_ID(); ?>" <?php post_class(); ?>>
 	<div class="main-description">
-    	<div class="left-side">        	
+    	<div class="left-side">
 			<?php
 				/**
 				 * woocommerce_show_product_images hook
@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
         </div>
         <div class="right-side">
         	<div class="desc">
-        		<h2><?=the_title();?></h2>
+        		<h2><?php echo the_title(); ?></h2>
 				<?php the_content(); ?>
             </div>
             <div class="price">
@@ -54,24 +54,24 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 				<?php
 				if ( ! $product->is_purchasable() ) return;
 				?>
-				
+
 				<?php
 					// Availability
 					$availability = $product->get_availability();
-				
+
 					if ($availability['availability']) :
 						echo apply_filters( 'woocommerce_stock_html', '<p class="stock ' . esc_attr( $availability['class'] ) . '">' . esc_html( $availability['availability'] ) . '</p>', $availability['availability'] );
 				    endif;
 				?>
-				
+
 				<?php if ( $product->is_in_stock() ) : ?>
-				
+
 					<?php do_action('woocommerce_before_add_to_cart_form'); ?>
-				
+
 					<form action="<?php echo esc_url( $product->add_to_cart_url() ); ?>" class="cart" method="post" enctype='multipart/form-data'>
-				
+
 					 	<?php do_action('woocommerce_before_add_to_cart_button'); ?>
-				
+
 					 	<?php
 					 		if ( ! $product->is_sold_individually() )
 					 			woocommerce_quantity_input( array(
@@ -79,15 +79,15 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 					 				'max_value' => apply_filters( 'woocommerce_quantity_input_max', $product->backorders_allowed() ? '' : $product->get_stock_quantity(), $product )
 					 			) );
 					 	?>
-				
+
 					 	<button type="submit" class="single_add_to_cart_button button alt"><?php echo apply_filters('single_add_to_cart_text', __( 'Add to cart', 'woocommerce' ), $product->product_type); ?></button>
-				
+
 					 	<?php do_action('woocommerce_after_add_to_cart_button'); ?>
-				
+
 					</form>
-				
+
 					<?php do_action('woocommerce_after_add_to_cart_form'); ?>
-				
+
 				<?php endif; ?>
             </div>
             <div class="tabs">
@@ -97,13 +97,13 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
                     <li class="lifestyle"><a href="#lifestyle">Lifestyle</a></li>
                 </ul>
                 <div id="highperformance">
-                	<?=get_post_meta($post->ID, 'high-performance', true);?>
+                	<?php echo get_post_meta($post->ID, 'high-performance', true);?>
                 </div>
                 <div id="gamechanger" style="display:none">
-                	<?=get_post_meta($post->ID, 'game-changer', true);?>
+                	<?php echo get_post_meta($post->ID, 'game-changer', true);?>
                 </div>
                 <div id="lifestyle" style="display:none">
-                	<?=get_post_meta($post->ID, 'lifestyle', true);?>
+                	<?php echo get_post_meta($post->ID, 'lifestyle', true);?>
                 </div>
             </div>
         </div>
@@ -113,13 +113,13 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
     	<div class="col first">
             <h3>With This Product, Experience:</h3>
             <ul>
-                <?=get_post_meta($post->ID, 'experience', true);?>
+                <?php echo get_post_meta($post->ID, 'experience', true);?>
             </ul>
         </div>
     	<div class="col">
             <h3>You Will Not Experience:</h3>
             <ul>
-                <?=get_post_meta($post->ID, 'not-experience', true);?>
+                <?php echo get_post_meta($post->ID, 'not-experience', true);?>
             </ul>
         </div>
     	<div class="clear"></div>
@@ -138,13 +138,13 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 				<?php if ($_SESSION['is_subscriber']==0) {?>
 				<p><strong>You have to be a member to submit questions.</strong></p>
 				<a href="<?php echo home_url( '/' ); ?>access-forum/" class="btn1">Sign up now</a>
-				<? } else { 
+				<? } else {
 				global $current_user;
       			get_currentuserinfo();
       			?>
 				<div id="form-error"></div>
-				<input type="hidden" name="name" value="<?=$current_user->user_firstname?>">
-				<input type="hidden" name="email_address" value="<?=$current_user->user_email?>">
+				<input type="hidden" name="name" value="<?php echo $current_user->user_firstname?>">
+				<input type="hidden" name="email_address" value="<?php echo $current_user->user_email?>">
                 <input type="text" name="subject" value="Subject" onblur="if(this.value=='')this.value='Subject';" onfocus="if(this.value=='Subject')this.value='';">
                 <textarea name="message" onblur="if(this.value=='')this.value='Enter your question here';" onfocus="if(this.value=='Enter your question here')this.value='';" rows="5">Enter your question here</textarea>
                 <a href="javascript:void(0)" class="btn1" id="submitQuestion">Submit Question</a>

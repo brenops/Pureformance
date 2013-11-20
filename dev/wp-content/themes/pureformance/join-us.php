@@ -1,4 +1,12 @@
-<?php 
+<?php
+if ( !is_user_logged_in() ) {
+    header( 'Location: ' . home_url( '/' ) . 'create-account/' );
+    exit;
+} else {
+    header( 'Location: ' . home_url( '/' ) . 'give-gift/' );
+    exit;
+}
+
 // Template Name: Join Us
 get_header(); ?>
 
@@ -8,7 +16,7 @@ get_header(); ?>
 
 				<div id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
                 	<div class="header">
-                    	<?php 
+                    	<?php
 							$headline = get_post_meta($post->ID, 'headline', true);
 							if($headline == '') { $headline = '<span>PURE</span> Simple, Powerful, Effective, Trusted'; }
 						?>
@@ -16,12 +24,12 @@ get_header(); ?>
                     </div>
 
 					<div class="entry-content">
-						<?php $side_image = get_post_meta($post->ID, 'side_image', true); 
+						<?php $side_image = get_post_meta($post->ID, 'side_image', true);
 							if(!empty($side_image)) {
 							$side_image_url = wp_get_attachment_image_src($side_image, 'full');
 						?>
 						<div class="side_image">
-							<img src="<?=$side_image_url[0]?>"> 
+							<img src="<?php echo $side_image_url[0]?>">
 						</div>
 						<?php } ?>
                         <?php echo get_post_meta($post->ID, 'intro_content', true); ?>
@@ -66,8 +74,8 @@ get_header(); ?>
 				</div><!-- #post-## -->
 
 			<?php endwhile; // end of the loop. ?>
-            
+
             <?php include (TEMPLATEPATH . '/bottom-boxes.php'); ?>
 		</div><!-- #container -->
-        
+
 <?php get_footer(); ?>

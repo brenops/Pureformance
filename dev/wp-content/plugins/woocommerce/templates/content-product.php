@@ -41,7 +41,7 @@ $feat_image = wp_get_attachment_url( get_post_thumbnail_id($post->ID) );
 
 	<?php do_action( 'woocommerce_before_shop_loop_item' ); ?>
 
-	<a href="<?php the_permalink(); ?>" class="product-list<?php if($modi == 1) { echo ' odd'; } else { echo ' even'; } ?>" style="background:url(<?=$feat_image?>) no-repeat; background-size:auto 240px;">
+	<a href="<?php the_permalink(); ?>" class="product-list<?php if($modi == 1) { echo ' odd'; } else { echo ' even'; } ?>" style="background:url(<?php echo $feat_image?>) no-repeat; background-size:auto 240px;">
 
 		<?php
 			/**

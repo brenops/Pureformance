@@ -1,4 +1,4 @@
-<?php 
+<?php
 //Template Name: Product Detail
 get_header(); ?>
 
@@ -8,7 +8,7 @@ get_header(); ?>
 
 				<div id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
                 	<div class="header">
-                    	<?php 
+                    	<?php
 							$headline = get_post_meta($post->ID, 'headline', true);
 							if($headline == '') { $headline = get_the_title(); }
 						?>
@@ -22,11 +22,11 @@ get_header(); ?>
                             </div>
                             <div class="right-side">
                             	<div class="desc">
-                            		<h2><?=the_title();?></h2>
-									<?php the_content(); ?>
+                            		<h2><?php echo the_title(); ?></h2>
+                                        <?php the_content(); ?>
                                 </div>
                                 <div class="price">
-									<span class="amount"><?=get_post_meta($post->ID, 'price', true);?></span>
+                                        <span class="amount"><?php echo get_post_meta($post->ID, 'price', true);?></span>
                                 	<label>Qty:</label> <input type="text" name="qty" value="1" />
                                 	<a href="" class="btn1"><span>Add to Cart</span></a>
                                 </div>
@@ -37,13 +37,13 @@ get_header(); ?>
                                         <li class="lifestyle"><a href="#lifestyle">Lifestyle</a></li>
                                     </ul>
                                     <div id="highperformance">
-                                    	.<?=get_post_meta($post->ID, 'high-performance', true);?>
+                                    	.<?php echo get_post_meta($post->ID, 'high-performance', true);?>
                                     </div>
                                     <div id="gamechanger" style="display:none">
-                                    	..<?=get_post_meta($post->ID, 'game-changer', true);?>
+                                    	..<?php echo get_post_meta($post->ID, 'game-changer', true);?>
                                     </div>
                                     <div id="lifestyle" style="display:none">
-                                    	...<?=get_post_meta($post->ID, 'lifestyle', true);?>
+                                    	...<?php echo get_post_meta($post->ID, 'lifestyle', true);?>
                                     </div>
                                 </div>
                             </div>
@@ -53,13 +53,13 @@ get_header(); ?>
                         	<div class="col first">
                                 <h3>With This Product, Experience:</h3>
                                 <ul>
-                                    <?=get_post_meta($post->ID, 'experience', true);?>
+                                    <?php echo get_post_meta($post->ID, 'experience', true);?>
                                 </ul>
                             </div>
                         	<div class="col">
                                 <h3>You Will Not Experience:</h3>
                                 <ul>
-                                    <?=get_post_meta($post->ID, 'not-experience', true);?>
+                                    <?php echo get_post_meta($post->ID, 'not-experience', true);?>
                                 </ul>
                             </div>
                         	<div class="clear"></div>
@@ -86,7 +86,7 @@ get_header(); ?>
 				</div><!-- #post-## -->
 
 			<?php endwhile; // end of the loop. ?>
-            
+
 		</div><!-- #container -->
-        
+
 <?php get_footer(); ?>

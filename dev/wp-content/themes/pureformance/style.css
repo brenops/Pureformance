@@ -1,6 +1,6 @@
 /*
 Theme Name: Pureformance
-Description: 
+Description:
 Author: F5 interactive
 Version: 1.0
 */
@@ -39,22 +39,22 @@ header, footer { width: 100%; }
 }
 @font-face {
     font-family: 'Helvetica';
-    src: url('fonts/helveticalight-webfont.eot'); 
+    src: url('fonts/helveticalight-webfont.eot');
 	src: local('Helvetica Light'), url('fonts/helveticalight-webfont.ttf') format("truetype");
 }
 @font-face {
     font-family: 'Interstate Bold';
-	src: url('fonts/interstateboldcondensed.eot');  
-	src: url('fonts/interstateboldcondensed.ttf') format("truetype"); 
+	src: url('fonts/interstateboldcondensed.eot');
+	src: url('fonts/interstateboldcondensed.ttf') format("truetype");
 }
 @font-face {
     font-family: 'Interstate Light';
-	src: url('fonts/interstatelightcondensed.eot');  
-	src: url('fonts/interstatelightcondensed.ttf') format("truetype"); 
+	src: url('fonts/interstatelightcondensed.eot');
+	src: url('fonts/interstatelightcondensed.ttf') format("truetype");
 }
 .wrapper {
 	width:940px;
-	margin:0 auto;	
+	margin:0 auto;
 }
 .clear { clear:both; }
 
@@ -193,7 +193,7 @@ input:-moz-placeholder { color:#777; }
 	margin-top:10px;
 	font-family:Interstate Bold;
 	text-transform:uppercase;
-	color:#fff;	
+	color:#fff;
 	letter-spacing:1px;
 	font-size:17px;
 }
@@ -202,7 +202,7 @@ input:-moz-placeholder { color:#777; }
 	color:#4898F0;
 }
 #header ul {
-	float:right;	
+	float:right;
 }
 #header li {
 	float:left;
@@ -258,7 +258,7 @@ input:-moz-placeholder { color:#777; }
 	margin-bottom:8px;
 	text-transform:uppercase;
 }
-#header li.signin .popup input[type=text], #header li.signin .popup input[type=password] {
+#header li.signin .popup input[type=text], #header li.signin .popup input[type=password], #create-account-form .input-text, #sign-in-form .input-text, #give-gift-form .input-text {
 	color:#737476;
 	font-size:13px;
 	border:1px solid #e4e4e5;
@@ -356,13 +356,13 @@ input:-moz-placeholder { color:#777; }
 }
 #side .tagline span {
 	display: block;
-	color:#c1c1c1;	
+	color:#c1c1c1;
 	font-size:14px;
 	font-style:italic;
 }
 #side .tagline span + span {
 	font-size: 16px;
-	color:#cecdcd;	
+	color:#cecdcd;
 }
 #side .tagline span + span + span {
 	font-size: 19px;
@@ -379,7 +379,7 @@ input:-moz-placeholder { color:#777; }
 }
 #side .inner {
 	/*border-top:3px solid #4898f0;*/
-	width:303px;	
+	width:303px;
 }
 #side .footer {
 	text-align:center;
@@ -558,9 +558,9 @@ input:-moz-placeholder { color:#777; }
 #content .header h1 {
 	font-family:"Interstate Bold", "Helvetica", Arial, san-serif;
 	/*
-border-left:1px solid #eee;	
+border-left:1px solid #eee;
 	border-right:1px solid #eee;
-*/	
+*/
 	padding-top:45px;
 	text-align:center;
 	height:70px;
@@ -681,7 +681,7 @@ ul.nav-icons li input[type=text], ul.nav-icons li input[type=email] {
 	background-image: -moz-linear-gradient(bottom, rgb(255,255,255) 16%, rgb(249,249,249) 58%);
 	background-image: -webkit-linear-gradient(bottom, rgb(255,255,255) 16%, rgb(249,249,249) 58%);
 	background-image: -ms-linear-gradient(bottom, rgb(255,255,255) 16%, rgb(249,249,249) 58%);
-	
+
 	background-image: -webkit-gradient(
 		linear,
 		left bottom,
@@ -1136,7 +1136,7 @@ form .form-row input.input-text, form .form-row textarea {
 	color:#fff;
 }
 .portals .over a.btn1 {
-	margin-left:22px;	
+	margin-left:22px;
 }
 
 /*CONTACT PAGE ********************************************************************************************************/
@@ -1167,13 +1167,13 @@ form .form-row input.input-text, form .form-row textarea {
    color: #ccc;
 }
 :-moz-placeholder { /* Firefox 18- */
-   color: #ccc;  
+   color: #ccc;
 }
 ::-moz-placeholder {  /* Firefox 19+ */
-   color: #ccc;  
+   color: #ccc;
 }
-:-ms-input-placeholder {  
-   color: #ccc;  
+:-ms-input-placeholder {
+   color: #ccc;
 }
 #contactForm .form-entry select {
 	-webkit-appearance: none;
@@ -1227,7 +1227,7 @@ form .form-row input.input-text, form .form-row textarea {
 
 /*PORTAL PAGE ********************************************************************************************************/
 #content.portal .entry-content {
-	padding:0;	
+	padding:0;
 	background-color: #eee;
 }
 #content.portal .portal-image {
@@ -1345,7 +1345,7 @@ ul.nav-icons li {
 }
 .plans.monthly {
 	border-top:5px solid #2680C6;
-	background-color:#f9f9f9; 
+	background-color:#f9f9f9;
 }
 .plans.annual1 {
 	height: 450px;
@@ -1416,7 +1416,7 @@ ul.nav-icons li {
 -webkit-border-radius: 8px;
 border-radius: 8px; /* future proofing */
 -khtml-border-radius: 8px; /* for old Konqueror browsers */
-} 
+}
 .plans.annual1 a {
 	color: #2680C6;
 	background: #fff;
@@ -1459,7 +1459,7 @@ body#blog, body.single-post {
 }
 #content #sidebar {
 	width:280px;
-	float:left;	
+	float:left;
 }
 #sidebar .widget-container {
 	margin-bottom:25px;
@@ -1546,7 +1546,7 @@ body#blog, body.single-post {
 }
 #blog .post.featured .copy {
 	float:right;
-	width:315px;	
+	width:315px;
 }
 #blog .post .category {
 	background:url(images/category.png) no-repeat;
@@ -1674,7 +1674,7 @@ ul.nav-icons li.active span {
 .category .hentry, .tag .hentry {
 	margin-bottom:30px;
 	padding-bottom:10px;
-	border-bottom:1px dotted #E6E6E6;	
+	border-bottom:1px dotted #E6E6E6;
 }
 .category h2, .tag h2 {
 	margin:0;

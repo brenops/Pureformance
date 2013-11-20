@@ -1,10 +1,10 @@
 $(document).ready(function(){
-	
+
 	resizeHeight();
 	$(window).bind('resize', function(event) {
 		resizeHeight();
-	}); 
-	
+	});
+
 	// Menu Description
 	/*$('.menu a').hover(function(){
 		$(this).stop().animate({height:'50px'},{queue:false,duration:400});
@@ -13,7 +13,7 @@ $(document).ready(function(){
 		$(this).stop().animate({height:'19px'},{queue:false,duration:400});
 		$(this).children('span').stop().animate({'margin-top':'6px'},{queue:false,duration:200});
 	});*/
-	
+
 	//Show hide side menu
 	$('#showside').click(function(){
 		$('#side').stop().animate({left:'0px'},{queue:false,duration:1200});
@@ -28,26 +28,26 @@ $(document).ready(function(){
 			$('#side').stop().animate({left:'-374px'},{queue:false,duration:1200});
 		}
 	});
-	
+
 	//Hover effect on products
 	$('.product-list.odd').hover(function(){
 		$(this).children('.over').stop().animate({right:'0px'},{queue:false,duration:300});
 	}, function() {
 		$(this).children('.over').stop().animate({right:'-150px'},{queue:false,duration:300});
 	});
-	
+
 	$('.product-list.even').hover(function(){
 		$(this).children('.over').stop().animate({left:'0px'},{queue:false,duration:300});
 	}, function() {
 		$(this).children('.over').stop().animate({left:'-150px'},{queue:false,duration:300});
 	});
-	
+
 	$('.book-list').hover(function(){
 		$(this).children('.over').stop().animate({right:'0px'},{queue:false,duration:300});
 	}, function() {
 		$(this).children('.over').stop().animate({right:'-150px'},{queue:false,duration:300});
 	});
-		
+
 	//Products Tabs
 	$('.tabs li a').click(function(){
 		$('.tabs li').removeClass('active');
@@ -56,15 +56,15 @@ $(document).ready(function(){
 		$('.tabs div').hide();
 		$(currentTab).show();
 		return false;
-	}); 
-	
+	});
+
 	//Bottom boxes products
 	$('.nav-icons li').hover(function(){
 		$(this).children('.over').stop().animate({bottom:'0px'},{queue:false,duration:300});
 	}, function() {
 		$(this).children('.over').stop().animate({bottom:'-210px'},{queue:false,duration:300});
 	});
-	
+
 	//Blog thumbs
 	$('#blog .post .thumb a').hover(function(){
 		$(this).children('img').stop().animate({width:'360px'},{queue:false,duration:300});
@@ -75,7 +75,7 @@ $(document).ready(function(){
 		$(this).children('img').animate({height:'223px'},{queue:false,duration:300});
 		$(this).children('img').animate({'margin-left':'0'},{queue:false,duration:300});
 	});
-	
+
 	//Experts
 	$('.experts h4').click(function(){
 		if($('.experts').hasClass('open')) {
@@ -83,20 +83,21 @@ $(document).ready(function(){
 				$('.experts').removeClass('open');
 			});
 		} else {
-			$('.experts').addClass('open');	
+			$('.experts').addClass('open');
 			$('.experts .info').fadeIn('slow');
 		}
 	});
-	
+
 	/*DROPDOWN NAVIGATION*/
 	$('ul.site-top-links').superfish({
 		delay:400,
 		autoArrows:false
 	});
-	
+
 	$('#members-only-trigger').fancybox();
 	$('#ask-expert').fancybox();
-	
+        $('#sign-in-trigger').fancybox();
+
 	$('#signup').fancybox({
 		'scrolling'		: 'no',
 		'titleShow'		: false,
@@ -109,9 +110,9 @@ $(document).ready(function(){
 // FUNCTION TO RESIZE THE HOME PAGE BACKGROUND
 function resizeHeight()
 {
-	var windowHeight = $(window).height();	
-	
+	var windowHeight = $(window).height();
+
 	var height = windowHeight-107+'px';
-	
+
 	$('#content').css('min-height',height);
 }
