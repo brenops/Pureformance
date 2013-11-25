@@ -90,20 +90,6 @@ get_header(); ?>
                             </div>
                         </li>
                     </ul>
-                <!--
-<div class="footer">
-                	<ul>
-                        <li><a href="<?php echo home_url( '/' ); ?>strategies/">Strategies</a></li>
-                        <li><a href="<?php echo home_url( '/' ); ?>blog/">Community</a></li>
-                        <li><a href="<?php echo home_url( '/' ); ?>shop/">Products</a></li>
-                        <li><a href="<?php echo home_url( '/' ); ?>about-us/">About Us</a></li>
-                        <li><a href="<?php echo home_url( '/' ); ?>contact-us/">Contact</a></li>
-                    </ul>
-                    <div class="clear"></div>
-                    <div class="copyright">Pureformance  &copy  <?=date('Y');?> All Rights Reserved</div>
-                </div>
-                <div class="footer-shadow"></div>
--->
 		</div><!-- #container -->
         
 <?php get_footer(); ?>

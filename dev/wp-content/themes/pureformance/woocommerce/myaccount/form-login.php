@@ -23,19 +23,19 @@ global $woocommerce; ?>
 	<div class="col-1">
 		<h2><?php _e( 'Login', 'woocommerce' ); ?></h2>
 		<form method="post" class="login">
-			<p class="form-row form-row-first">
-				<label for="username"><?php _e( 'Username or email', 'woocommerce' ); ?> <span class="required">*</span></label>
-				<input type="text" class="input-text" name="username" id="username" />
+			<p class="form-row form-row-first" style="margin-bottom:0;">
+				<label for="username"></label>
+				<input type="text" class="input-text" name="username" id="username" placeholder="<?php _e( 'Email', 'woocommerce' ); ?>" />
 			</p>
-			<p class="form-row form-row-last">
-				<label for="password"><?php _e( 'Password', 'woocommerce' ); ?> <span class="required">*</span></label>
-				<input class="input-text" type="password" name="password" id="password" />
+			<p class="form-row form-row-last" style="margin-bottom:0;">
+				<label for="password"></label>
+				<input class="input-text" type="password" name="password" id="password" placeholder="<?php _e( 'Password', 'woocommerce' ); ?>" />
 			</p>
 			<div class="clear"></div>
 
 			<p class="form-row">
 				<?php $woocommerce->nonce_field('login', 'login') ?>
-				<input type="submit" class="button" name="login" value="<?php _e( 'Login', 'woocommerce' ); ?>" />
+				<input type="submit" class="btn1" name="login" value="<?php _e( 'Login', 'woocommerce' ); ?>" />
 				<a class="lost_password" href="<?php
 
 				$lost_password_page_id = woocommerce_get_page_id( 'lost_password' );
@@ -45,7 +45,7 @@ global $woocommerce; ?>
 				else
 					echo esc_url( wp_lostpassword_url( home_url() ) );
 
-				?>"><?php _e( 'Lost Password?', 'woocommerce' ); ?></a>
+				?>" style="color:#444;margin-left:120px;"><?php _e( 'Forgot Password?', 'woocommerce' ); ?></a>
 			</p>
 		</form>
 	</div>
@@ -78,11 +78,11 @@ global $woocommerce; ?>
 
 			<div class="clear"></div>
 
-			<p class="form-row form-row-first">
+			<p class="form-row form-row-first" style="margin-bottom:0;">
 				<label for="reg_password"><?php _e( 'Password', 'woocommerce' ); ?> <span class="required">*</span></label>
 				<input type="password" class="input-text" name="password" id="reg_password" value="<?php if (isset($_POST['password'])) echo esc_attr($_POST['password']); ?>" />
 			</p>
-			<p class="form-row form-row-last">
+			<p class="form-row form-row-last" style="margin-bottom:0;">
 				<label for="reg_password2"><?php _e( 'Re-enter password', 'woocommerce' ); ?> <span class="required">*</span></label>
 				<input type="password" class="input-text" name="password2" id="reg_password2" value="<?php if (isset($_POST['password2'])) echo esc_attr($_POST['password2']); ?>" />
 			</p>

@@ -24,6 +24,7 @@
 <div style="display:none">
 	<div id="ask-expert-form" class="ask-expert-popup">
 		<h2>We are here to help!</h2>
+		<div id="form-error"></div>
 		<?
 		global $current_user;
       	get_currentuserinfo();

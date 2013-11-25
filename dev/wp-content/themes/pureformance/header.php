@@ -24,6 +24,7 @@
 <head>
 <meta charset="<?php bloginfo( 'charset' ); ?>" />
 <link rel="icon" href="http://pureformance.com/dev/favicon.ico" type="image/x-icon"> 
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
 <title><?php
 	/*
 	 * Print the <title> tag based on what is being viewed.
@@ -61,6 +62,7 @@
 <script src="<?php bloginfo( 'template_directory' ); ?>/js/ask-expert.js" type="text/javascript"></script>
 <script src="<?php bloginfo( 'template_directory' ); ?>/js/superfish.js" type="text/javascript"></script>
 <script src="<?php bloginfo( 'template_directory' ); ?>/js/fancybox/jquery.fancybox-1.3.4.js" type="text/javascript"></script>
+<script src="<?php bloginfo( 'template_directory' ); ?>/js/responsive-nav.js" type="text/javascript"></script>
 <script type="text/javascript">
 	var is_subscriber = '<?=$_SESSION['is_subscriber']?>';
 	var is_logged_in = '<?=is_user_logged_in()?>';
@@ -87,6 +89,15 @@
 	
 
 	
+</script>
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)
+[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-44954629-1', 'pureformance.com');
+ga('send', 'pageview');
 </script>
 <?php if(is_home()) { ?>
 
@@ -119,11 +130,22 @@
 </head>
 
 <body id="<?php echo the_slug();?>" <?php body_class(); ?> <?php if(is_home()) { echo 'oncontextmenu="return false"'; } ?>>
-<?php 
-if(!is_home()) { ?>
 <div id="header">
 	<div class="wrapper">
-        <a href="<?php echo home_url( '/' ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home" class="logo"><!-- <img src="<?php bloginfo( 'template_directory' ); ?>/images/small-logo.png" alt="<?php bloginfo( 'name' ); ?>" title="<?php bloginfo( 'name' ); ?>"> --><span>Pure</span>formance</a>
+        <div id="mobile-nav">
+		    <ul>
+		        <li><a href="<?php echo home_url( '/' ); ?>strategies/">Strategies</a></li>
+	        	<li><a href="<?php echo home_url( '/' ); ?>blog/">Community & Features</a></li>
+	        	<li><a href="<?php echo home_url( '/' ); ?>shop/">Products</a></li>
+	        	<li><a href="<?php echo home_url( '/' ); ?>about-us/">About Us</a></li>
+	        	<li><a href="<?php echo home_url( '/' ); ?>cart/" class="icon">View Cart</a></li>
+            	<li><a href="<?=home_url( '/' )?>my-account" class="icon"><?=(is_user_logged_in() ? 'My Account' : 'Sign in')?></a></li>
+            	<?php if(is_user_logged_in()){ ?><li><a href="<?php echo wp_logout_url(home_url( '/' )); ?>" class="icon">Sign Out</a></li><? } ?>
+            <?php if ($_SESSION['is_subscriber']==0) {?><li class="membership"><a href="<?=home_url( '/' )?>membership/">Give the Gift</a></li><? } ?>
+
+		    </ul>
+	    </div>
+        <a href="<?php echo home_url( '/' ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home" class="logo"><span>Pure</span>formance</a>
         <ul class="site-top-links">
         	<?php //if (!is_user_logged_in() || $_SESSION['is_subscriber']==0) {?><!-- <li class="joinus"><a href="#signup-form" id="signup">Join Us</a></li> --><?php //} ?>
         	<?php if(the_slug() == "blog" || is_category() || $post->post_type == "post") { ?>
@@ -157,14 +179,14 @@ if(!is_home()) { ?>
                     </div>
 -->
 					<form method="post" class="">
-						<input type="text" class="input-text" name="username" id="username" placeholder="Username" />
+						<input type="text" class="input-text" name="username" id="username" placeholder="Email" />
 						<input class="input-text" type="password" name="password" id="password" placeholder="Password" />
 						
 						<div class="form-row">
 							<?php global $woocommerce; ?>
 							<?php $woocommerce->show_messages(); ?>
 							<?php $woocommerce->nonce_field('login', 'login') ?>
-							<input type="submit" class="button" name="login" value="<?php _e( 'Login', 'woocommerce' ); ?>" />
+							<input type="submit" class="btn1" name="login" value="<?php _e( 'Login', 'woocommerce' ); ?>" />
 							<a class="lost_password" href="<?php
 			
 							$lost_password_page_id = woocommerce_get_page_id( 'lost_password' );
@@ -174,18 +196,18 @@ if(!is_home()) { ?>
 							else
 								echo esc_url( wp_lostpassword_url( home_url() ) );
 			
-							?>"><?php _e( 'Lost Password?', 'woocommerce' ); ?></a>
+							?>"><?php _e( 'Forgot Password?', 'woocommerce' ); ?></a>
 						</div>
 					</form>
                 </ul>
 				<?php } ?>
             </li>
             <?php if(is_user_logged_in()){ ?><li class="signout"><a href="<?php echo wp_logout_url(home_url( '/' )); ?>" class="icon">Sign Out</a></li><? } ?>
-            <?php if ($_SESSION['is_subscriber']==0) {?><li class="joinus"><a href="<?=home_url( '/' )?>membership/">Join Us</a></li><? } ?>
+            <?php if ($_SESSION['is_subscriber']==0) {?><li class="joinus"><a href="<?=home_url( '/' )?>membership/">Give the Gift</a></li><? } ?>
         </ul>
+        <div class="clear"></div>
     </div>
 </div>
-<?php } ?>
 <a href="#members-only" id="members-only-trigger"></a>
 <div style="display:none">
 	<div id="members-only" class="ask-expert-popup">
@@ -198,7 +220,7 @@ if(!is_home()) { ?>
 				<?php global $woocommerce; ?>
 				<?php $woocommerce->show_messages(); ?>
 				<?php $woocommerce->nonce_field('login', 'login') ?>
-				<input type="submit" class="button" name="login" value="Go Pure" />
+				<input type="submit" class="btn1" name="login" value="Go Pure" />
 				<a class="lost_password" href="<?php
 
 				$lost_password_page_id = woocommerce_get_page_id( 'lost_password' );
@@ -208,12 +230,13 @@ if(!is_home()) { ?>
 				else
 					echo esc_url( wp_lostpassword_url( home_url() ) );
 
-				?>"><?php _e( 'Lost Password?', 'woocommerce' ); ?></a>
+				?>">Forgot Password?</a>
 			</div>
-			<div class="form-row">
+			<div class="clear"></div>
+			<div class="form-row bottom">
 				<p>Not yet a member?<br>
 We offer monthly and annual membership packages!</p>
-			<center><a href="<?php echo home_url( '/' ); ?>membership/" class="btn1" style="display:inline-block"><span>Join Now</span></a></center>
+			<center><a href="<?php echo home_url( '/' ); ?>membership/" class="btn2" style="display:inline-block"><span>Join Now</span></a></center>
 			</div>
 		</form>
 	</div>

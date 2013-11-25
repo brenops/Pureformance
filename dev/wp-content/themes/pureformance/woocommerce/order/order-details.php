@@ -50,22 +50,6 @@ $order = new WC_Order( $order_id );
 				$item_meta = new WC_Order_Item_Meta( $item['item_meta'] );
 				$item_meta->display();
 
-				if ( $_product->exists() && $_product->is_downloadable() && $order->is_download_permitted() ) {
-
-					$download_file_urls = $order->get_downloadable_file_urls( $item['product_id'], $item['variation_id'], $item );
-
-					$i     = 0;
-					$links = array();
-
-					foreach ( $download_file_urls as $file_url => $download_file_url ) {
-
-						$links[] = '<small><a href="' . $download_file_url . '">' . sprintf( __( 'Download file%s', 'woocommerce' ), ( count( $download_file_urls ) > 1 ? ' ' . ( $i + 1 ) . ': ' : ': ' ) ) . basename( $file_url ) . '</a></small>';
-
-						$i++;
-					}
-
-					echo implode( '<br/>', $links );
-				}
 
 				echo '</td><td class="product-total">' . $order->get_formatted_line_subtotal( $item ) . '</td></tr>';
 
@@ -94,12 +78,12 @@ $order = new WC_Order( $order_id );
 <header>
 	<h2><?php _e( 'Customer details', 'woocommerce' ); ?></h2>
 </header>
-<dl class="customer_details">
+<p class="customer_details">
 <?php
-	if ($order->billing_email) echo '<dt>'.__( 'Email:', 'woocommerce' ).'</dt><dd>'.$order->billing_email.'</dd>';
-	if ($order->billing_phone) echo '<dt>'.__( 'Telephone:', 'woocommerce' ).'</dt><dd>'.$order->billing_phone.'</dd>';
+	if ($order->billing_email) echo ''.__( 'Email:', 'woocommerce' ).' '.$order->billing_email.'<br>';
+	if ($order->billing_phone) echo ''.__( 'Telephone:', 'woocommerce' ).' '.$order->billing_phone.'<br>';
 ?>
-</dl>
+</p>
 
 <?php if (get_option('woocommerce_ship_to_billing_address_only')=='no') : ?>
 

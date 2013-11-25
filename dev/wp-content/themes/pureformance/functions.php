@@ -193,11 +193,11 @@ endif;
 function form_func( $atts ){
 	$form = '<div class="contact_form"><form id="contactForm">';
 		$form .= '<div id="form-error"></div>';
-		$form .= '<div class="form-entry"><input type="text" name="name" placeholder="Name*"></div>';	
-		$form .= '<div class="form-entry"><input type="text" name="phone" placeholder="Phone"></div>';	
-		$form .= '<div class="form-entry"><input type="text" name="email_address" placeholder="Email*"></div>';	
-		$form .= '<div class="form-entry"><select name="subject">
-			<option value="">Subject*</option>
+		$form .= '<div class="form-entry"><input type="text" name="name" value="Name*" onfocus="if(this.value==\'Name*\')this.value=\'\';" onblur="if(this.value==\'\')this.value=\'Name*\';"></div>';	
+		$form .= '<div class="form-entry"><input type="text" name="phone" value="Phone" onfocus="if(this.value==\'Phone\')this.value=\'\';" onblur="if(this.value==\'\')this.value=\'Phone\';"></div>';	
+		$form .= '<div class="form-entry"><input type="text" name="email_address" value="Email*" onfocus="if(this.value==\'Email*\')this.value=\'\';" onblur="if(this.value==\'\')this.value=\'Email*\';"></div>';	
+		$form .= '<div class="form-entry"><span class="css-select-moz"><select name="subject">
+			<option value="" class="default">Subject*</option>
 			<option>I\'d like to see</option>
 			<option>I\'d like to submit content</option>
 			<option>I\'d like to get involved</option>
@@ -205,8 +205,8 @@ function form_func( $atts ){
 			<option>I want to know more</option>
 			<option>I have a concern</option>
 			<option>Technical help</option>
-		</select></div>';	
-		$form .= '<div class="form-entry full"><textarea name="message" rows="7" placeholder="Message*"></textarea></div>';	
+		</select></span></div>';	
+		$form .= '<div class="form-entry full"><textarea name="message" rows="7" onfocus="if(this.value==\'Message*\')this.value=\'\';" onblur="if(this.value==\'\')this.value=\'Message*\';">Message*</textarea></div>';	
 		$form .= '<div class="captcha"><div class="img"><img src="'.get_bloginfo('template_directory').'/captcha.php?date='.date('YmdHis').'" /></div><label>Prove you are a Game-Changer and not a robot. <br>Enter the code from the image on the left.</label><input type="text" name="captcha"></div>';
 		$form .= '<a href="javascript:void(0)" id="submitContact" class="btn1"><span>Submit</span></a>';	
 	$form .= '</form></div>';
@@ -370,61 +370,18 @@ function my_save_portal_field( $user_id ) {
 	update_usermeta( $user_id, 'portal', $_POST['portal'] );
 }
 
+function my_login_logo() { ?>
+    <style type="text/css">
+        body.login div#login h1 a {
+            background-image: url(<?php echo get_bloginfo( 'template_directory' ) ?>/images/logo.png);
+            height: 180px;
+            background-size: auto!important;
+        }
+    </style>
+<?php }
+//add_action( 'login_enqueue_scripts', 'my_login_logo' );
 
-
-
-/*$prefix = '_posts_'; // start with an underscore to hide fields from custom fields list
-add_filter( 'cmb_meta_boxes', 'be_sample_metaboxes' );
-function be_sample_metaboxes( $meta_boxes ) {
-$meta_boxes = array();
-	
-	$meta_boxes[] = array(
-	    'id' => 'post_metabox',
-	    'title' => 'Portal Description',
-	    'pages' => array('product'), // post type
-		'context' => 'normal',
-		'priority' => 'high',
-		'show_names' => true, // Show field names on the left
-	    'fields' => array(
-	        array(
-	            'name' => 'High Performance',
-	            'desc' => '',
-	            'id' => $prefix . 'high-performance',
-	            'type' => 'wysiwyg'
-	        ),
-			array(
-		        'name' => 'Game Changer',
-		        'desc' => '',
-		        'id' => $prefix . 'game-changer',
-		        'type' => 'wysiwyg'
-		    ),
-			array(
-		        'name' => 'Lifestyle',
-		        'desc' => '',
-		        'id' => $prefix . 'lifestyle',
-		        'type' => 'wysiwyg'
-		    ),
-			array(
-		        'name' => 'With This Product, Experience',
-		        'desc' => '',
-		        'id' => $prefix . 'experience',
-		        'type' => 'wysiwyg'
-		    ),
-			array(
-		        'name' => 'You Will Not Experience',
-		        'desc' => '',
-		        'id' => $prefix . 'not-experience',
-		        'type' => 'wysiwyg'
-		    ),
-	    ),
-	);
-	
-
-	return $meta_boxes;
+function pure_admin_scripts() {
+	wp_enqueue_script( 'script-name', get_template_directory_uri() . '/js/admin.js', array(), '1.0.0', true );
 }
-add_action('init','be_initialize_cmb_meta_boxes',9999);
-function be_initialize_cmb_meta_boxes() {
-    if (!class_exists('cmb_Meta_Box')) {
-        require_once('init.php');
-    }
-}*/
+add_action( 'admin_enqueue_scripts', 'pure_admin_scripts' );

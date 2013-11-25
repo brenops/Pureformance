@@ -15,10 +15,12 @@ $(document).ready(function(){
 		//show the loading sign
 		//$('.loading').show();
 		
+		$('#submitQuestion').fadeOut('fast');
+		
 		
 		//start the ajax
 		$.ajax({
-			url: "http://pureformance.com/dev/wp-content/themes/pureformance/submitQuestion.php",	
+			url: "https://pureformance.com/dev/wp-content/themes/pureformance/submitQuestion.php",	
 			type: "GET",		
 			data: data,		
 			cache: false,
@@ -29,12 +31,16 @@ $(document).ready(function(){
 					$(':input','#contactForm').not(':button, :submit, :reset, :hidden').val('');							
 					$('#form-error').html('Your message was successfully sent.');
 					$('#form-error').fadeIn('slow');
-					setTimeout(function() { $('#form-error').fadeOut('slow') }, 5000);
+					setTimeout(function() { 
+						$('#form-error').fadeOut('slow');
+						$('#submitQuestion').fadeIn('fast');
+					}, 5000);
 					
 				//if process.php returned 0/false (send mail failed)
 				} else {
 					$('#form-error').html(html);
 					$('#form-error').fadeIn('slow');
+					$('#submitQuestion').fadeIn('fast');
 				}			
 			}		
 		});

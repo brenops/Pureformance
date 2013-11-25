@@ -1107,7 +1107,7 @@
 
 		autoScale : true,
 		autoDimensions : true,
-		centerOnScroll : false,
+		centerOnScroll : true,
 
 		ajax : {},
 		swf : { wmode: 'transparent' },
@@ -1116,7 +1116,7 @@
 		hideOnContentClick : false,
 
 		overlayShow : true,
-		overlayOpacity : 0.8,
+		overlayOpacity : 0.9,
 		overlayColor : '#777',
 
 		titleShow : true,
@@ -1136,9 +1136,9 @@
 		easingIn : 'swing',
 		easingOut : 'swing',
 
-		showCloseButton	 : true,
+		showCloseButton	 : false,
 		showNavArrows : true,
-		enableEscapeButton : true,
+		enableEscapeButton : false,
 		enableKeyboardNav : true,
 
 		onStart : function(){},
