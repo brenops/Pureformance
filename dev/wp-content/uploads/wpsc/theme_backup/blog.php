@@ -1,4 +1,4 @@
-<?php 
+<?php
 // Template Name: Blog
 get_header(); ?>
 
@@ -87,7 +87,7 @@ get_header(); ?>
                                     <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
                                 </form>
                                 </div>
-                                
+
                                 <!--End mc_embed_signup-->
                             </div>
                         </li>
@@ -97,7 +97,7 @@ get_header(); ?>
                             <div class="over">
                             	<h2>Search</h2>
                             	<p>Search any articles on our blog</p>
-                                <?php echo get_search_form(); ?> 
+                                <?php echo get_search_form(); ?>
                             </div>
                         </li>
                     </ul>
@@ -110,9 +110,9 @@ get_header(); ?>
                         <li><a href="<?php echo home_url( '/' ); ?>contact-us/">Contact</a></li>
                     </ul>
                     <div class="clear"></div>
-                    <div class="copyright">Pureformance  &copy  <?=date('Y');?> All Rights Reserved</div>
+                    <div class="copyright">Pureformance  &copy  <?php echo date('Y');?> All Rights Reserved</div>
                 </div>
                 <div class="footer-shadow"></div>
 		</div><!-- #container -->
-        
+
 <?php get_footer(); ?>

@@ -8,7 +8,7 @@
  */
 
 //THIS WAS TAKEN FROM WOO TEMPLATES FOLDER, I MOVED HERE BECAUSE I READ THAT IF WOO UPDATES IT WOULD OVERWRITE MY CHANGES MADE TO THE PLUGIN. THAT BEST PRACTICE IS TO MOVE TO THE THEME FOLDER
- 
+
 global $woocommerce;
 ?>
 
@@ -37,11 +37,11 @@ global $woocommerce;
 
 			foreach ( $woocommerce->cart->get_cart() as $cart_item_key => $values ) {
 				$_product = $values['data'];
-									
+
 				if ( $_product->exists() && $values['quantity'] > 0 ) {
-					
+
 					if($values['product_id']==213){ $blog_purchase=true;	} //this is for checking if we have ordered a subscription
-					
+
 					?>
 					<tr class = "<?php echo esc_attr( apply_filters('woocommerce_cart_table_item_class', 'cart_table_item', $values, $cart_item_key ) ); ?>">
 						<!-- Remove from cart link -->
@@ -151,7 +151,7 @@ global $woocommerce;
 				?>
 					<tr>
 						<td colspan="6">
-							Would you like to purchase a subscription to the blog for an extra $<?=$blog_prod->price?> per month? 
+							Would you like to purchase a subscription to the blog for an extra $<?php echo $blog_prod->price?> per month?
 							<?php do_action('woocommerce_before_add_to_cart_form'); ?>
 							<form enctype="multipart/form-data" method="post" class="cart" action="/pureformance/shop/blog-subscription/?add-to-cart=213">
 	 							<div style="display:none;" class="quantity buttons_added"><input type="button" class="minus" value="-"><input maxlength="12" class="input-text qty text" title="Qty" size="4" value="1" data-max="0" data-min="1" name="quantity"><input type="button" class="plus" value="+"></div>

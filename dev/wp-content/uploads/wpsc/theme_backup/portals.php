@@ -1,13 +1,13 @@
-<?php 
+<?php
 // Template Name: Portal
-get_header(); 
+get_header();
 echo $post->post_name;
 ?>
 
 		<div id="content" class="wrapper portal">
 
-			<?php if ( have_posts() ) while ( have_posts() ) : the_post(); 
-			
+			<?php if ( have_posts() ) while ( have_posts() ) : the_post();
+
 			if($post->post_name == 'high-performance') {
 				$portal = "1";
 			} else if($post->post_name == 'game-changer') {
@@ -19,7 +19,7 @@ echo $post->post_name;
 
 				<div id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
                 	<div class="header">
-                    	<?php 
+                    	<?php
 							$headline = get_post_meta($post->ID, 'headline', true);
 							if($headline == '') { $headline = get_the_title(); }
 						?>
@@ -27,7 +27,7 @@ echo $post->post_name;
                     </div>
 
 					<div class="entry-content">
-                    	<img src="<?php bloginfo( 'template_directory' ); ?>/images/portal<?=$portal?>-medium.jpg" class="portal-image" />
+                    	<img src="<?php bloginfo( 'template_directory' ); ?>/images/portal<?php echo $portal ?>-medium.jpg" class="portal-image" />
                         <div class="portal-options">
                             <ul>
                             	<li<?php if($portal == 1) { echo ' style="display:none;"'; } ?>><a href="<?php echo home_url( '/' ); ?>portals/high-performance/"><img src="<?php bloginfo( 'template_directory' ); ?>/images/portal1-thumb.jpg"/></li>
@@ -72,7 +72,7 @@ echo $post->post_name;
 				</div><!-- #post-## -->
 
 			<?php endwhile; // end of the loop. ?>
-            
+
 		</div><!-- #container -->
-        
+
 <?php get_footer(); ?>

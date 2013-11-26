@@ -48,7 +48,7 @@
     {
       if(event.button==2)
        {
-         return false;    
+         return false;
        }
     }
     </script>
@@ -64,7 +64,7 @@
         <ul class="site-top-links">
         	<?php if(the_slug() == "blog" || is_single() || is_category()) { ?>
             <!--li class="categories"><a href="">Categories</a-->
-            	<?php wp_list_categories('orderby=name&exclude=1,4,5&title_li=<a href="">Categories</a>'); ?> 
+            	<?php wp_list_categories('orderby=name&exclude=1,4,5&title_li=<a href="">Categories</a>'); ?>
             </li>
             <li class="tags"><a href="javascript:void(0);">Tags</a>
             <ul>
@@ -127,7 +127,7 @@
             	<a href="">Terms</a> <a href="<?php echo home_url( '/' ); ?>contact-us/">Contact Us</a>
             </div>
             <div class="copyright">
-            	Copyright &copy; <?=date('Y')?> - pureformance
+            	Copyright &copy; <?php echo date('Y')?> - pureformance
             	<a href="http://www.f5interactive.com" target="_blank">Created by F5 Interactive</a>
             </div>
         </div>

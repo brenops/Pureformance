@@ -35,7 +35,7 @@
                         <li><a href="<?php echo home_url( '/' ); ?>contact-us/">Contact</a></li>
                     </ul>
                     <div class="clear"></div>
-                    <div class="copyright">Pureformance  &copy  <?=date('Y');?> All Rights Reserved</div>
+                    <div class="copyright">Pureformance  &copy  <?php echo date('Y');?> All Rights Reserved</div>
                 </div>
                 <div class="footer-shadow"></div>
 			</div><!-- #content -->

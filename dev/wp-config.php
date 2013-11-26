@@ -14,19 +14,34 @@
  * @package WordPress
  */
 
+$debug = true;
+
 // ** MySQL settings - You can get this info from your web host ** //
-/** The name of the database for WordPress */
-define('DB_NAME', 'db162384_pureformance');
+if ($debug) {
+    /** The name of the database for WordPress */
+    define('DB_NAME', 'pureformance');
 
-/** MySQL database username */
-define('DB_USER', 'db162384');
+    /** MySQL database username */
+    define('DB_USER', 'root');
 
-/** MySQL database password */
-define('DB_PASSWORD', 'f5lucasv505');
+    /** MySQL database password */
+    define('DB_PASSWORD', '');
 
-/** MySQL hostname */
-define('DB_HOST', 'internal-db.s162384.gridserver.com');
+    /** MySQL hostname */
+    define('DB_HOST', 'localhost');
+} else {
+    /** The name of the database for WordPress */
+    define('DB_NAME', 'db162384_pureformance');
 
+    /** MySQL database username */
+    define('DB_USER', 'db162384');
+
+    /** MySQL database password */
+    define('DB_PASSWORD', 'f5lucasv505');
+
+    /** MySQL hostname */
+    define('DB_HOST', 'internal-db.s162384.gridserver.com');
+}
 /** Database Charset to use in creating database tables. */
 define('DB_CHARSET', 'utf8');
 
@@ -78,7 +93,7 @@ define('WPLANG', '');
  * It is strongly recommended that plugin and theme developers use WP_DEBUG
  * in their development environments.
  */
-define('WP_DEBUG', false);
+define('WP_DEBUG', true);
 
 /* That's all, stop editing! Happy blogging. */
 

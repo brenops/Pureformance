@@ -191,8 +191,9 @@ create_initial_post_types();
 register_theme_directory( get_theme_root() );
 
 // Load active plugins.
-foreach ( wp_get_active_and_valid_plugins() as $plugin )
+foreach ( wp_get_active_and_valid_plugins() as $plugin ) {
 	include_once( $plugin );
+}
 unset( $plugin );
 
 // Load pluggable functions.
@@ -203,8 +204,9 @@ require( ABSPATH . WPINC . '/pluggable-deprecated.php' );
 wp_set_internal_encoding();
 
 // Run wp_cache_postload() if object cache is enabled and the function exists.
-if ( WP_CACHE && function_exists( 'wp_cache_postload' ) )
+if ( WP_CACHE && function_exists( 'wp_cache_postload' ) ) {
 	wp_cache_postload();
+}
 
 do_action( 'plugins_loaded' );
 
@@ -269,8 +271,9 @@ load_default_textdomain();
 
 $locale = get_locale();
 $locale_file = WP_LANG_DIR . "/$locale.php";
-if ( ( 0 === validate_file( $locale ) ) && is_readable( $locale_file ) )
+if ( ( 0 === validate_file( $locale ) ) && is_readable( $locale_file ) ) {
 	require( $locale_file );
+}
 unset( $locale_file );
 
 // Pull in locale data after loading text domain.
