@@ -10,9 +10,29 @@ Author URI:
 
 add_action( 'save_post', 'scSendCouponByEmail' );
 
+add_action( 'plugins_loaded', 'scInit' );
+
 $scOutput = '';
 
+
+function scInit() {
+    /*if (isset($_GET['coupon'])) {
+        scAddUserUsing();
+    }*/
+}
+
+/**
+ *
+ * @global type $wpdb
+ * @global type $scOutput
+ * @param type $post_id
+ * @return type
+ *
+ * @deprecated
+ */
 function scSendCouponByEmail($post_id) {
+
+    return;
 
     $post = get_post($post_id);
 
@@ -40,7 +60,7 @@ function scSendCouponByEmail($post_id) {
     $discount_type = get_post_meta( $post_id, 'discount_type', true );
     $expiry_date = get_post_meta( $post_id, 'expiry_date', true );
 
-    error_log('post save: post_status:' . var_export($post->post_status, 1) ); // post_status:'publish'
+    /*error_log('post save: post_status:' . var_export($post->post_status, 1) ); // post_status:'publish'
     error_log('post save: post_type:' . var_export($post->post_type, 1) ); // post_type:'shop_coupon'
     error_log('post save: post_name:' . var_export($post->post_name, 1) ); // post_name:'test-coupon-004'
     error_log('post save: post_excerpt:' . var_export($post->post_excerpt, 1) ); // post_excerpt:'test coupon 4 you 004'
@@ -48,6 +68,7 @@ function scSendCouponByEmail($post_id) {
     error_log('post save: customer_email:' . var_export($customer_email, 1) ); // customer_email:'nikitaleksikov@gmail.com'
     error_log('post save: discount_type:' . var_export($discount_type, 1) ); //  discount_type:'sign_up_fee'
     error_log('post save: expiry_date:' . var_export($expiry_date, 1) ); // expiry_date:'2013-11-29',
+    */
 
     $coupon_code = $post->post_name;
     $created = time();
@@ -69,7 +90,7 @@ function scSendCouponByEmail($post_id) {
     add_filter('the_content', 'scContentFilter');
 }
 
-function scContentFilter($content) {
+function scContentFilter( $content ) {
     global $scOutput;
 
     return $content . $scOutput;

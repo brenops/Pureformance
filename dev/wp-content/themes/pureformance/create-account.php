@@ -1,42 +1,27 @@
 <?php
 // Template Name: Create Account
 
+$firstname = null;
+$email = null;
+// get coupon code
+$couponCode = null;
+if (isset($_GET['coupon'])) {
+    $couponCode = trim($_GET['coupon']);
+    $couponCode = preg_replace("/[^a-zA-Z0-9_\s]/", '', $couponCode);
+
+    $coupon = new WC_Coupon($couponCode);
+    if ($coupon && $coupon->is_valid() && isset($coupon->customer_email)) {
+        $email = is_array($coupon->customer_email) ? $coupon->customer_email[0] : '';
+    }
+
+    // add membership to cart of current user
+    do_action( 'addgifttocart' );
+}
+
 if ( is_user_logged_in() ) {
     header( 'Location: ' . home_url( '/' ) . 'give-gift/' );
     exit;
 }
-
-$firstname = null;
-$email = null;
-
-/*$couponCode = null;
-// if the code is not empty
-if (!empty($code)) {
-    // get the code from wpsc_coupon_codes table
-    global $wpdb;
-
-    if ($wpdb && $wpdb->prefix) {
-        $couponCode = $wpdb->get_row(
-            $wpdb->prepare(
-                "SELECT id, coupon_code, value, `is-used`, active, start, expiry FROM {$wpdb->prefix}wpsc_coupon_codes WHERE coupon_code = %s",
-                $code
-            ),
-            ARRAY_A
-        );
-
-        //$couponCode['id'];
-    }
-
-    // if the code not found then redirect to promo page
-    if (!empty($couponCode)) {
-        // @todo check for expired?
-
-        $code = isset($couponCode['coupon_code']) ? $couponCode['coupon_code'] : '';
-
-        $firstname = isset($couponCode['firstname']) ? $couponCode['firstname'] : '';
-        $email = isset($couponCode['email']) ? $couponCode['email'] : '';
-    }
-}*/
 
 get_header();
 
@@ -63,6 +48,7 @@ $(document).ready(function(){
             <?php the_content(); ?>
             <div>
                 <form method="POST" id="create-account-form" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">
+                <input type="hidden" name="coupon" value="<?php echo isset($couponCode) ? esc_attr($couponCode) : '' ?>" />
                 <div style="float:left; width:270px;">
                     <label for="firstname">Username:</label>
                 </div>

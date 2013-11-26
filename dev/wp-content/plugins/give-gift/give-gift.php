@@ -3,20 +3,75 @@
 Plugin Name: Give Gift
 Plugin URI:
 Description: Give a Gift to somebody. Check First Name, Email, Message and if the recipient exists in Pool.
-Version: 1.0
+Version:
 Author:
 Author URI:
 */
 
 $ggOutput = '';
+$ggReceiver = null;
 
+// check Give a Gift form and save receiver data
 add_action( 'plugins_loaded', 'ggInit' );
 
 //add_action( 'givegift', 'ggGiveGift' );
 
+// after checkout, update gift history and send emails
 add_action( 'woocommerce_thankyou', 'ggGiveGift', 10 );
 
+// add new product (gift for membership) to cart
 add_action( 'addgifttocart', 'ggAddProductToCard' );
+
+function ggIsGift() {
+    return true;
+}
+
+function ggInfoMessage() {
+    return 'Give a gift for:';
+}
+
+function ggGetLastReceiver() {
+    global $wpdb;
+    global $ggReceiver;
+
+    if (!$ggReceiver) {
+        $purchaserUserId = get_current_user_id();
+
+        $ggReceiver = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT user_receiver, user_receiver_firstname, user_receiver_message FROM {$wpdb->prefix}gift_history WHERE user_purchaser = %d AND status = 0 ORDER BY updated DESC LIMIT 1",
+                $purchaserUserId
+            )
+        );
+    }
+}
+
+function ggReceiverEmail() {
+    global $ggReceiver;
+    $receiverEmail = '';
+
+    ggGetLastReceiver();
+    // if already exists (e.g. second try to give a gift) then update receiver data
+    if ($ggReceiver && $ggReceiver->user_receiver) {
+        $receiver = get_userdata($ggReceiver->user_receiver);
+        $receiverEmail = $receiver->user_email;
+    }
+
+    return $receiverEmail;
+}
+
+function ggReceiverMessage() {
+    global $ggReceiver;
+    $receiverMessage = '';
+
+    ggGetLastReceiver();
+
+    if ($ggReceiver && $ggReceiver->user_receiver_message) {
+        $receiverMessage = $ggReceiver->user_receiver_message;
+    }
+
+    return $receiverMessage;
+}
 
 function ggInit() {
 
@@ -24,9 +79,6 @@ function ggInit() {
         ggSaveGiftReceiver();
     }
 
-    // add product to card
-    //$product_id = 267; // Membership (monthly)
-    //ggAddProductToCard($product_id);
 }
 
 function ggSaveGiftReceiver() {
@@ -118,7 +170,7 @@ function ggSaveGiftReceiver() {
     exit;
 }
 
-function ggGiveGift($order_id) {
+function ggGiveGift( $order_id ) {
 
     error_log( 'Call ggGiveGift' );
 
@@ -192,12 +244,12 @@ function ggGiveGift($order_id) {
             // add purchaser to pool (only once)
             if (!$row) {
                 // generate a key for invite page
-                $gift_key = wp_generate_password($length = 20, $include_standard_special_chars = false);
+                $gift_key = wp_generate_password(20, false);
 
                 $wpdb->insert(
                     $wpdb->prefix . 'users_pool',
                     array('ID' => $purchaserUserId, 'status' => 0, 'gift_key' => $gift_key, 'created' => $created),
-                    array('%d', '%s', '%d')
+                    array('%d', '%d', '%s', '%d')
                 );
             } else {
                 $gift_key = $row->gift_key;
@@ -295,6 +347,12 @@ function ggUserDataValidation($data) {
     $userId = email_exists($data['email']);
     if ($userId) {
 
+        // check user != current user
+        if ($userId == get_current_user_id()) {
+            $errors['email'] = __('You can not give a gift to yourself');
+            return $errors;
+        }
+
         error_log( 'ggUserDataValidation: check POOL for user id:' . var_export($userId, 1) );
 
         // check if user in pool, we can give a gift only for users in pool
@@ -342,7 +400,8 @@ function ggAddProductToCard( $product_id ) {
     if ( ! is_admin() ) {
         global $woocommerce;
         $found = false;
-        $product_id = 267; // Membership (monthly)
+        //$product_id = 267; // Membership (monthly)
+        $product_id = 637; // Gift Membership (monthly)
 
         error_log( 'ggAddProductToCard: cart:' . var_export($woocommerce->cart, 1) );
 
