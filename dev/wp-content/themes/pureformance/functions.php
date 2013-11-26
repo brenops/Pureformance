@@ -9,7 +9,7 @@ if ( ! function_exists( 'twentyten_setup' ) ):
  */
 function twentyten_setup() {
 
-	add_filter('show_admin_bar', '__return_false'); 
+	add_filter('show_admin_bar', '__return_false');
 
 	// This theme uses post thumbnails
 	add_theme_support( 'post-thumbnails' );
@@ -187,7 +187,7 @@ function pure_posted_in() {
 }
 endif;
 
-/** 
+/**
 * Add Contact Form shortcodes
 */
 function form_func( $atts ){
@@ -208,20 +208,26 @@ function form_func( $atts ){
 		</select></span></div>';	
 		$form .= '<div class="form-entry full"><textarea name="message" rows="7" onfocus="if(this.value==\'Message*\')this.value=\'\';" onblur="if(this.value==\'\')this.value=\'Message*\';">Message*</textarea></div>';	
 		$form .= '<div class="captcha"><div class="img"><img src="'.get_bloginfo('template_directory').'/captcha.php?date='.date('YmdHis').'" /></div><label>Prove you are a Game-Changer and not a robot. <br>Enter the code from the image on the left.</label><input type="text" name="captcha"></div>';
-		$form .= '<a href="javascript:void(0)" id="submitContact" class="btn1"><span>Submit</span></a>';	
+		$form .= '<a href="javascript:void(0)" id="submitContact" class="btn1"><span>Submit</span></a>';
 	$form .= '</form></div>';
-	
+
 	return $form;
 }
 add_shortcode( 'contact-form', 'form_func' );
 
 function the_slug() {
-    $post_data = get_post($post->ID, ARRAY_A);
-    $slug = $post_data['post_name'];
-    return $slug; 
+    global $post;
+    $slug = '';
+    
+    if (isset($post->ID)) {
+        $post_data = get_post($post->ID, ARRAY_A);
+        $slug = $post_data['post_name'];
+    }
+
+    return $slug;
 }
 
-/** 
+/**
 * Customize admin tabs
 */
 function change_post_menu_label() {
@@ -253,12 +259,12 @@ add_action( 'admin_menu', 'change_post_menu_label' );
 
 function remove_links_tab_menu_pages() {
 	remove_menu_page('link-manager.php');
-	remove_menu_page('tools.php');	
+	remove_menu_page('tools.php');
 }*/
 add_action('init', 'strategies_register');
- 
+
 function strategies_register() {
- 
+
 	$labels = array(
 		'name' => _x('Strategies', 'post type general name'),
 		'singular_name' => _x('book_type', 'post type singular name'),
@@ -272,7 +278,7 @@ function strategies_register() {
 		'not_found_in_trash' => __('Nothing found in Trash'),
 		'parent_item_colon' => ''
 	);
- 
+
 	$args = array(
 		'labels' => $labels,
 		'public' => true,
@@ -285,8 +291,8 @@ function strategies_register() {
 		'hierarchical' => false,
 		'menu_position' => null,
 		'supports' => array('title','editor','thumbnail')
-	  ); 
- 
+	  );
+
 	register_post_type( 'strategies' , $args );
 }
 
@@ -381,7 +387,3 @@ function my_login_logo() { ?>
 <?php }
 //add_action( 'login_enqueue_scripts', 'my_login_logo' );
 
-function pure_admin_scripts() {
-	wp_enqueue_script( 'script-name', get_template_directory_uri() . '/js/admin.js', array(), '1.0.0', true );
-}
-add_action( 'admin_enqueue_scripts', 'pure_admin_scripts' );

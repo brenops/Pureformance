@@ -1,15 +1,33 @@
 <?php
 /**
- * Thankyou page
+ * Thankyou page for Give a Gift
  *
- * @author 		WooThemes
- * @package 	WooCommerce/Templates
- * @version     2.0.0
+ * @author
+ * @package
+ * @version
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
+// get receiver data from db
+$firstname = '';
+global $wpdb;
 global $woocommerce;
+
+$purchaserUserId = get_current_user_id();
+$receiver = $wpdb->get_row(
+    $wpdb->prepare(
+        "SELECT user_receiver, user_receiver_firstname, user_receiver_message FROM {$wpdb->prefix}gift_history WHERE user_purchaser = %d AND status = 0 ORDER BY id DESC LIMIT 1",
+        $purchaserUserId
+    ), ARRAY_A
+);
+
+if ($receiver && isset($receiver['user_receiver_firstname'])) {
+    $firstname = $receiver['user_receiver_firstname'];
+}
+
+//
+do_action( 'givegift' );
 
 if ( $order ) : ?>
 
@@ -32,7 +50,6 @@ if ( $order ) : ?>
 		</p>
 
 	<?php else : ?>
-
 		<?php
 			//ADD ORDER NOTE IF SUCCESSFULL
 			$order->add_order_note( 'Portal : '.$_SESSION['portal'], 0 );
@@ -112,6 +129,26 @@ if ( $order ) : ?>
 							<a href="<?php echo home_url( '/' ); ?>membership/?add-to-cart=557">Join Now</a>
 						</div>
 		<? } ?>
+		<h2>Thank You For Giving the Gift of Opportunity</h2>
+		<p>
+                    Just gave <strong><?php echo $firstname; ?></strong> a chance to better themselves and become a<br />
+                    game changer!<br />
+                    An email has been sent for him to create an account and begin enjoying his first month of content,<br />
+                    courtesy of your kindness.
+                </p>
+
+                <div class="clear"></div>
+
+                <h2>Wow, that felt good ...</h2>
+                <div>
+                    <form method="GET" id="give-gift-form" action="<?php echo esc_url( home_url( '/' ) . 'give-gift/' ); ?>">
+                    <div>
+                        <input type="submit" class="btn1" name="giveGift" value="<?php esc_attr_e( 'Give Another Gift', 'twentyeleven' ); ?>" />
+                    </div>
+                    </form>
+                </div>
+
+		<div class="clear"></div>
 
 		<?php endif; ?>
 

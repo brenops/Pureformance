@@ -1,6 +1,6 @@
 <div id="footer">
-	<div class="wrapper">
-		<ul>
+    <div class="wrapper">
+            <ul>
 	    	<li class="facebook"><a href="http://www.facebook.com/pureformance" target="_blank">Facebook</a></li>
 	        <li class="twitter"><a href="http://www.twitter.com/pureformance" target="_blank">Twitter</a></li>
 	        <li class="google"><a href="https://plus.google.com/u/1/104981603964545695483/posts" target="_blank">Google Plus</a></li>
@@ -11,8 +11,6 @@
 	    </div>
     </div>
 </div>
-<?php
-	wp_footer();
-?>
+<?php wp_footer(); ?>
 </body>
 </html>
