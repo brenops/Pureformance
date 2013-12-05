@@ -12,6 +12,7 @@
 	</a>
 </strong>
 
+<p><?php echo sprintf(__("To redeem your discount use the following coupon code during checkout:", 'wc_smart_coupons'), $blogname); ?></p>
 <center><a href="<?php echo home_url( '/' ); ?>promo-code/?coupon=<?php echo $coupon_code ?>"><?php echo sprintf(__("Join now", 'wc_smart_coupons') ); ?></a></center>
 
 <?php if ( !empty( $from ) ) { ?>

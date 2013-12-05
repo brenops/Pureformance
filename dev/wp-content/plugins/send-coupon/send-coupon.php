@@ -21,6 +21,16 @@ function scInit() {
     }*/
 }
 
+function scSendSmartCouponByEmail($post_id) {
+
+    if ( !empty( $_GET['action'] ) && ( $_GET['action'] == 'sent_gift_certificate' ) && !empty( $_GET['page'] ) && ( $_GET['page']=='woocommerce_coupon_csv_import' ) ) {
+        $email = $_POST['smart_coupon_email'];
+        $amount = $_POST['smart_coupon_amount'];
+        $this->send_gift_certificate( $email, $amount );
+    }
+
+}
+
 /**
  *
  * @global type $wpdb

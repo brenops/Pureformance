@@ -21,7 +21,7 @@ if (isset($_GET['key'])) {
             0
         )
     );
-    if ($row && $row->ID) {
+    if ( $row && $row->ID ) {
         $receiver = get_userdata($row->ID);
 
         $firstname = !empty($receiver->user_nicename) ? $receiver->user_nicename : $receiver->user_login;
@@ -29,8 +29,10 @@ if (isset($_GET['key'])) {
     }
 }
 
-// add membership to cart of current user
+// Add a Gift Membership to cart of current user
 do_action( 'addgifttocart' );
+// Check if user has coupon (gift) and in POOL then go to checkout to buy a Membership
+do_action( 'giftproceed' );
 
 get_header();
 

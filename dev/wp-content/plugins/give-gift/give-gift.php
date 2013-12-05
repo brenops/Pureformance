@@ -8,19 +8,31 @@ Author:
 Author URI:
 */
 
+/**
+ * Add a new product in admin panel (membership),
+ * Add a smart coupon for this product
+ * Get a product_id and update the constant
+ */
+define('MEMBERSHIP_GIFT_PRODUCT_ID', 637);
+define('MEMBERSHIP_PRODUCT_ID', 267); // Membership (monthly)
+
 $ggOutput = '';
 $ggReceiver = null;
 
-// check Give a Gift form and save receiver data
+// init plugin
 add_action( 'plugins_loaded', 'ggInit' );
 
-//add_action( 'givegift', 'ggGiveGift' );
-
-// after checkout, update gift history and send emails
+// On checkout submit, update gift history and send emails
 add_action( 'woocommerce_thankyou', 'ggGiveGift', 10 );
 
-// add new product (gift for membership) to cart
+// On Give a Gift page add a product (gift for membership) to cart
 add_action( 'addgifttocart', 'ggAddProductToCard' );
+//add_action( 'woocommerce_before_cart', 'ggAddProductToCard' );
+//add_action( 'init', 'ggAddProductToCard' );
+
+// On Give a Gift page check the user in POOL and coupon exists then go to checkout
+add_action( 'giftproceed', 'ggGiftProceed' );
+
 
 function ggIsGift() {
     return true;
@@ -73,14 +85,29 @@ function ggReceiverMessage() {
     return $receiverMessage;
 }
 
+/**
+ * Init plugin
+ * Check Give a Gift form submit
+ *
+ */
 function ggInit() {
 
     if (isset($_POST['giveGift'])) {
+        // Give a Gift form submit - save receiver data and go to checkout
         ggSaveGiftReceiver();
     }
 
 }
 
+/**
+ * On Give a Gift page submit
+ * Save Gift receiver Firstname, email, message and go to checkout
+ *
+ * @global type $wpdb
+ * @global type $ggOutput
+ * @global type $current_user
+ * @return type
+ */
 function ggSaveGiftReceiver() {
     global $wpdb;
     global $ggOutput;
@@ -160,16 +187,28 @@ function ggSaveGiftReceiver() {
         );
     }
 
-    // add product to card
-    // $product_id = 267; // Membership (monthly)
-    // @todo How to add details about receiver?
-    // ggAddProductToCard( $product_id );
-
     // go to checkout
     wp_redirect( esc_url( home_url( '/' ) . 'checkout/' ) );
     exit;
 }
 
+/**
+ * On checkout submit (buy membership)
+ *
+ * 1. User buy a Gift for somebody (friend in POOL or random user from POOL)
+ * - get receiver data
+ * - update user gift history
+ * - add purchaser to pool (status = 0)
+ * - update receiver in pool - remove from pool (set status = 1)
+ *
+ * 2. User has a coupon (Got a Gift) and buy a membership for himself using the coupon
+ * remove the user from POOL?
+ *
+ * @global type $wpdb
+ * @global type $woocommerce
+ * @global type $current_user
+ * @param type $order_id
+ */
 function ggGiveGift( $order_id ) {
 
     error_log( 'Call ggGiveGift' );
@@ -181,16 +220,7 @@ function ggGiveGift( $order_id ) {
     $purchaserEmail  = $current_user->user_email;
     $purchaserUserId = $current_user->ID;
 
-    $receiver = $wpdb->get_row(
-        $wpdb->prepare(
-            "SELECT user_receiver, user_receiver_firstname, user_receiver_message FROM {$wpdb->prefix}gift_history WHERE user_purchaser = %d AND status = 0 ORDER BY id DESC LIMIT 1",
-            $purchaserUserId
-        ), ARRAY_A
-    );
-
-    error_log('user has bought a gift for receiver:' . var_export($receiver, 1) );
-
-    error_log('order id:' . var_export($order_id, 1) );
+    error_log( 'order id:' . var_export($order_id, 1) );
 
     $order = new WC_Order( $order_id );
 
@@ -199,124 +229,205 @@ function ggGiveGift( $order_id ) {
             // error
             error_log('order status is failed for:' . var_export($purchaserEmail, 1) );
         } else {
-            $created = time();
-            // get receiver data from session
-            $receiverFirstname = isset($receiver['user_receiver_firstname']) ? $receiver['user_receiver_firstname'] : null;
-            $receiverUserId    = isset($receiver['user_receiver']) ? $receiver['user_receiver'] : null;
-            $receiverMessage   = isset($receiver['user_receiver_message']) ? $receiver['user_receiver_message'] : null;
-            // get email by user id
-            $receiver = get_userdata($receiverUserId);
-            $receiverEmail = $receiver->email;
+            // check which product id in the order
+            $isGift = false;
+            $isMembership = false;
+            $orderItems = $order->get_items();
+            if ( sizeof( $orderItems ) ) {
+                foreach ($orderItems as $item) {
+                    error_log('order product_id:' . var_export($item['product_id'], 1) . ' item:' . var_export($item, 1) );
 
-            // update gift history
-            $wpdb->update(
-                $wpdb->prefix . 'gift_history',
-                array(
-                    'order_id' => $order->id,
-                    'status'   => 1,
-                    'updated'  => $created
-                ),
-                array(
-                    'user_purchaser' => $purchaserUserId,
-                    'user_receiver'  => $receiverUserId,
-                    'status'         => 0,
-                ),
-                array(
-                    '%d',
-                    '%d',
-                    '%d'
-                ),
-                array(
-                    '%d',
-                    '%d',
-                    '%d'
-                )
-            );
+                    if ( !empty($item['product_id']) && is_array($item['product_id']) && isset($item['product_id'][0]) ) {
+                        $productId = $item['product_id'][0];
+                    } else {
+                        $productId = $item['product_id'];
+                    }
 
-            $gift_key = null;
-            // check if purchaser in pool
-            $row = $wpdb->get_row(
-                $wpdb->prepare(
-                    "SELECT ID, status, gift_key FROM {$wpdb->prefix}users_pool WHERE ID = %d",
-                    $purchaserUserId
-                )
-            );
-            // add purchaser to pool (only once)
-            if (!$row) {
-                // generate a key for invite page
-                $gift_key = wp_generate_password(20, false);
-
-                $wpdb->insert(
-                    $wpdb->prefix . 'users_pool',
-                    array('ID' => $purchaserUserId, 'status' => 0, 'gift_key' => $gift_key, 'created' => $created),
-                    array('%d', '%d', '%s', '%d')
-                );
-            } else {
-                $gift_key = $row->gift_key;
+                    if ($productId == MEMBERSHIP_PRODUCT_ID) {
+                        $isMembership = true;
+                    }
+                    if ($productId == MEMBERSHIP_GIFT_PRODUCT_ID) {
+                        $isGift = true;
+                    }
+                }
             }
 
-            // check if receiver in pool
-            $row = $wpdb->get_row(
-                $wpdb->prepare(
-                    "SELECT ID, status FROM {$wpdb->prefix}users_pool WHERE ID = %d AND status = %d",
-                    $receiverUserId,
-                    0
-                )
-            );
-            // update receiver in pool if exists and status = 0
-            if ($row) {
+            $created = time();
+            // 1. User has bought a Gift for somebody
+            if ( $isGift && !$isMembership ) {
+                // get receiver data from database
+                $receiver = $wpdb->get_row(
+                    $wpdb->prepare(
+                        "SELECT user_receiver, user_receiver_firstname, user_receiver_message FROM {$wpdb->prefix}gift_history WHERE user_purchaser = %d AND status = 0 ORDER BY id DESC LIMIT 1",
+                        $purchaserUserId
+                    ), ARRAY_A
+                );
+
+                error_log('user has bought a gift for receiver:' . var_export($receiver, 1) );
+
+                $receiverFirstname = isset($receiver['user_receiver_firstname']) ? $receiver['user_receiver_firstname'] : null;
+                $receiverUserId    = isset($receiver['user_receiver']) ? $receiver['user_receiver'] : null;
+                $receiverMessage   = isset($receiver['user_receiver_message']) ? $receiver['user_receiver_message'] : null;
+                // get email by user id (receiverUserId)
+                $receiver = get_userdata($receiverUserId);
+                $receiverEmail = $receiver->email;
+
+                // update gift history
                 $wpdb->update(
-                    $wpdb->prefix . 'users_pool',
+                    $wpdb->prefix . 'gift_history',
                     array(
-                        'status'  => 1,
-                        'updated' => $created
+                        'order_id' => $order->id,
+                        'status'   => 1,
+                        'updated'  => $created
                     ),
-                    array( 'ID' => $receiverUserId ),
                     array(
+                        'user_purchaser' => $purchaserUserId,
+                        'user_receiver'  => $receiverUserId,
+                        'status'         => 0,
+                    ),
+                    array(
+                        '%d',
                         '%d',
                         '%d'
                     ),
-                    array( '%d' )
+                    array(
+                        '%d',
+                        '%d',
+                        '%d'
+                    )
                 );
-            }
 
-            // 1. send an email to receiver
-            ob_start();
-            ?>
+                $gift_key = null;
+                // check if purchaser in pool
+                $row = $wpdb->get_row(
+                    $wpdb->prepare(
+                        "SELECT ID, status, gift_key FROM {$wpdb->prefix}users_pool WHERE ID = %d",
+                        $purchaserUserId
+                    )
+                );
+                // add purchaser to pool (only once)
+                if (!$row) {
+                    // generate a key for invite page
+                    $gift_key = wp_generate_password(20, false);
 
-            <h2>Somebody has bought a Membership for you.</h2>
+                    $wpdb->insert(
+                        $wpdb->prefix . 'users_pool',
+                        array('ID' => $purchaserUserId, 'status' => 0, 'gift_key' => $gift_key, 'created' => $created),
+                        array('%d', '%d', '%s', '%d')
+                    );
+                } else {
+                    $gift_key = $row->gift_key;
+                }
 
-            <?php echo $receiverMessage ?>
+                // check if receiver in pool
+                $row = $wpdb->get_row(
+                    $wpdb->prepare(
+                        "SELECT ID, status FROM {$wpdb->prefix}users_pool WHERE ID = %d AND status = %d",
+                        $receiverUserId,
+                        0
+                    )
+                );
+                // update receiver in pool if exists and status = 0
+                if ($row) {
+                    $wpdb->update(
+                        $wpdb->prefix . 'users_pool',
+                        array(
+                            'status'  => 1,
+                            'updated' => $created
+                        ),
+                        array( 'ID' => $receiverUserId ),
+                        array(
+                            '%d',
+                            '%d'
+                        ),
+                        array( '%d' )
+                    );
+                }
 
-            <a href="<?php echo home_url( '/' ) . '/create-account/' ?>">Activate now</a>
+                // 1. send an email to receiver
+                ob_start();
 
-            <?php
-            $receiverMessage = ob_get_clean();
-            //$receiverMessage = "Somebody has bought a Membership for you. {$receiverMessage} For activation go to: " . home_url( '/' ) . '/create-account/';
-            $result1 = wp_mail($receiverEmail, __('Pureformance Membership'), $receiverMessage);
-            error_log('send email to receiver:' . var_export($result1, 1) . ' email:' . $receiverEmail . ' message:' . $receiverMessage);
+                //woocommerce_get_template('emails/email-header.php', array( 'email_heading' => $email_heading ));
+                ?>
+                <h2>Somebody has bought a Membership for you.</h2>
 
+                <p><?php echo $receiverMessage ?></p>
 
+                <a href="<?php echo home_url( '/' ) . 'create-account/' ?>">Activate now</a>
 
-            // 2. send an email to purchaser
-            ob_start();
-            ?>
+                <?php
+                //woocommerce_get_template('emails/email-footer.php');
 
-            <h2>You have bought a Membership for <?php echo $receiverFirstname ?></h2>
+                $receiverMessage = ob_get_clean();
+                $result1 = wp_mail($receiverEmail, __('Pureformance Membership'), $receiverMessage);
+                error_log('send email to receiver:' . var_export($result1, 1) . ' email:' . $receiverEmail . ' message:' . $receiverMessage);
 
-            Somebody will help you soon!
+                // 2. send an email to purchaser
+                ob_start();
+                //woocommerce_get_template('emails/email-header.php', array( 'email_heading' => $email_heading ));
+                ?>
 
-            Share this link with your friends:
-            <?php echo home_url( '/' ) . '/give-gift/?key=' . $gift_key ?>
+                <h2>You have bought a Membership for <?php echo $receiverFirstname ?></h2>
 
-            <?php
-            $purchaserMessage = ob_get_clean();
-            //$purchaserMessage = "You have bought a Membership for user {$receiverFirstname}. Somebody will help you soon!";
-            $result2 = wp_mail($purchaserEmail, __('Pureformance Membership'), $purchaserMessage);
-            error_log('send email to purchaser:' . var_export($result2, 1) . ' email:' . $purchaserEmail . ' message:' . $purchaserMessage);
+                <p>Somebody will help you soon!</p>
 
-            if ($result1 && $result2) {
-                //
+                <p>Share this link with your friends:</p>
+                <p><?php echo home_url( '/' ) . 'give-gift/?key=' . $gift_key ?></p>
+
+                <?php
+                //woocommerce_get_template('emails/email-footer.php');
+
+                $purchaserMessage = ob_get_clean();
+                $result2 = wp_mail($purchaserEmail, __('Pureformance Membership'), $purchaserMessage);
+                error_log('send email to purchaser:' . var_export($result2, 1) . ' email:' . $purchaserEmail . ' message:' . $purchaserMessage);
+
+                if ($result1 && $result2) {
+                    //
+                }
+            } // if ($isGift && !$isMembership) {
+
+            // 2. User has bought a Membership
+            if ( !$isGift && $isMembership ) {
+                // check if current user IN POOL
+                $row = $wpdb->get_row(
+                    $wpdb->prepare(
+                        "SELECT ID, status FROM {$wpdb->prefix}users_pool WHERE ID = %d AND status = %d",
+                        $purchaserUserId,
+                        0
+                    )
+                );
+                // update current user in pool if exists and status = 0
+                if ( $row ) {
+                    $wpdb->update(
+                        $wpdb->prefix . 'users_pool',
+                        array(
+                            'status'  => 1,
+                            'updated' => $created
+                        ),
+                        array( 'ID' => $purchaserUserId ),
+                        array(
+                            '%d',
+                            '%d'
+                        ),
+                        array( '%d' )
+                    );
+                }
+
+                // 1. send an email to current user
+                ob_start();
+
+                //woocommerce_get_template('emails/email-header.php', array( 'email_heading' => $email_heading ));
+                ?>
+                <h2>You have bought a Membership.</h2>
+
+                <a href="<?php echo home_url( '/' ) ?>">Go to Pureformance</a>
+
+                <?php
+                //woocommerce_get_template('emails/email-footer.php');
+
+                $message = ob_get_clean();
+                $result = wp_mail($purchaserEmail, __('Pureformance Membership'), $message);
+                error_log('send email to receiver:' . var_export($result, 1) . ' email:' . $purchaserEmail . ' message:' . $message);
             }
 
         } // $order->status != 'failed'
@@ -385,7 +496,7 @@ function ggUserDataValidation($data) {
     }
 
     if (empty($data['message'])) {
-        $errors['message'] = __('Password is empty');
+        $errors['message'] = __('Message is empty. Please add a message.');
     } elseif (mb_strlen($data['message']) < 10) {
         $errors['message'] = __('Too short message');
     } elseif (mb_strlen($data['message']) > 1000) {
@@ -395,32 +506,182 @@ function ggUserDataValidation($data) {
     return $errors;
 }
 
+/**
+ * On Give a Gift page Add a product with id: <MEMBERSHIP_GIFT_PRODUCT_ID> to user cart
+ *
+ * @global type $woocommerce
+ * @param int $product_id
+ */
 function ggAddProductToCard( $product_id ) {
+    error_log('ggAddProductToCard' );
+
+    if ( !is_user_logged_in() ) {
+        error_log('ggAddProductToCard: user is not logged in' );
+        return;
+    }
 
     if ( ! is_admin() ) {
         global $woocommerce;
+        global $wpdb;
         $found = false;
-        //$product_id = 267; // Membership (monthly)
-        $product_id = 637; // Gift Membership (monthly)
+        $couponCode = null;
+        $productId = null;
 
-        error_log( 'ggAddProductToCard: cart:' . var_export($woocommerce->cart, 1) );
+        // simply check if user has a coupon then he need to apply it to Membership
+        if ( isset( $_GET['coupon'] ) ) {
+            $couponCode = trim( $_GET['coupon'] );
+            $couponCode = preg_replace( "/[^a-zA-Z0-9_\s]/", '', $couponCode );
+            // validate
+            $coupon = new WC_Coupon($couponCode);
+            if ( !$coupon->is_valid() ) {
+                return;
+            }
+            error_log( 'ggAddProductToCard: coupon is valid:' . var_export($couponCode, 1) );
 
-        if ( sizeof( $woocommerce->cart->get_cart() ) > 0 ) {
-            foreach ( $woocommerce->cart->get_cart() as $cart_item_key => $values ) {
+            $productId = MEMBERSHIP_PRODUCT_ID; // Membership (monthly)
+        } else {
+            // check if user want to Give a Gift to somebody
+            $purchaserUserId = get_current_user_id();
+            $receiver = $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT user_receiver, user_receiver_firstname, user_receiver_message FROM {$wpdb->prefix}gift_history WHERE user_purchaser = %d AND status = 0 ORDER BY updated DESC LIMIT 1",
+                    $purchaserUserId
+                )
+            );
+            if ($receiver && $receiver->user_receiver) {
+                $productId = MEMBERSHIP_GIFT_PRODUCT_ID; // Gift Membership (monthly)
+            }
+        }
+
+        if ( empty( $productId ) ) {
+            return;
+        }
+
+        $cartItems = $woocommerce->cart->get_cart();
+        error_log( 'ggAddProductToCard: productId:' . $productId . ' before check cart items:' . var_export($cartItems, 1) );
+
+        if ( sizeof( $cartItems ) > 0 ) {
+            foreach ( $cartItems as $cart_item_key => $values ) {
                 $_product = $values['data'];
-                if ( $_product->id == $product_id ) {
+                if ( $_product->id == $productId ) {
                     $found = true;
+                    error_log( 'ggAddProductToCard: productId:' . $productId . ' already in the cart:' . var_export($woocommerce->cart, 1) );
                 }
             }
-            // if product not found, add it
+            // if product not found then add it
             if ( ! $found ) {
-                $woocommerce->cart->add_to_cart( $product_id );
+                $result = $woocommerce->cart->add_to_cart( $productId );
+                error_log( 'ggAddProductToCard: productId:' . $productId . ' result:' . var_export($result, 1) );
             }
         } else {
-            // if no products in cart, add it
-            $woocommerce->cart->add_to_cart( $product_id );
+            // if no products in cart then add it
+            $result = $woocommerce->cart->add_to_cart( $productId );
+            error_log( 'ggAddProductToCard: productId:' . $productId . ' result:' . var_export($result, 1) );
+        }
+
+        // apply coupon if exists
+        if ( !empty( $couponCode ) ) {
+            if ( $woocommerce->cart && !$woocommerce->cart->add_discount( sanitize_text_field( $couponCode )) ) {
+                error_log( 'ggAddProductToCard: error add coupon:' . $couponCode . ' to cart' );
+                $woocommerce->show_messages();
+            } else {
+                error_log( 'ggAddProductToCard: add coupon:' . $couponCode . ' to cart' );
+            }
+
+            $woocommerce->cart->calculate_totals();
+        }
+
+        if ( $productId == MEMBERSHIP_GIFT_PRODUCT_ID ) {
+            wp_redirect( esc_url( home_url( '/' ) . 'checkout/' ) );
+            exit;
         }
     }
+}
+
+/**
+ * Check if current user in POOL (with status = 0) and has coupons
+ * then go to checkout and add coupon
+ * This is only for users which are in POOL and somebody gave them a Gift
+ */
+function ggGiftProceed() {
+    global $woocommerce;
+    global $wpdb;
+
+    $isPool = false;
+    $isGotAGift = false;
+    $currentUserId = get_current_user_id();
+
+    // check if user in POOL
+    $row = $wpdb->get_row(
+        $wpdb->prepare(
+            "SELECT ID, status, gift_key FROM {$wpdb->prefix}users_pool WHERE ID = %d",
+            $currentUserId
+        )
+    );
+    if ($row && $row->status == 0) {
+        $isPool = true;
+    }
+
+    error_log( 'ggGiftProceed: isPool:' . var_export($isPool, 1) );
+
+    if (!$isPool) {
+        return;
+    }
+
+    // check coupons
+    $args = array(
+        'numberposts'     => -1,
+        'meta_key'        => '_customer_user',
+        'meta_value'	  => $currentUserId,
+        'post_type'       => 'shop_order',
+        'post_status'     => 'publish'
+    );
+    $orders = get_posts($args);
+
+    $couponForMembership = '';
+    if ($orders) {
+        foreach ($orders as $or) {
+            $order = new WC_Order();
+
+            $order->populate( $or );
+            $orderId = $order->id;
+            //error_log( 'ggGiftProceed: order id: ' . var_export($orderId, 1) . 'order:' . var_export($order, 1) );
+            // Get the coupon array
+            $coupon_receiver_details = get_post_meta( $orderId, 'sc_coupon_receiver_details', true );
+
+            //error_log( 'ggGiftProceed: coupon details:' . var_export($coupon_receiver_details, 1) );
+            if ( is_array( $coupon_receiver_details ) && !empty( $coupon_receiver_details ) ) {
+                foreach ($coupon_receiver_details as $coupon_receiver_detail) {
+                    if ( isset($coupon_receiver_detail['code'], $coupon_receiver_detail['amount']) ) {
+
+                        $couponForMembership = $coupon_receiver_detail['code'];
+
+                        if ( $woocommerce->cart->has_discount( sanitize_text_field( $couponForMembership ) ) ) {
+                            error_log( 'ggGiftProceed: has_discount:' . var_export($couponForMembership, 1) );
+                            $woocommerce->cart->remove_coupons( sanitize_text_field( $couponForMembership ) );
+                        }
+
+                        error_log( 'ggGiftProceed: add_discount:' . var_export($couponForMembership, 1) );
+                        $woocommerce->cart->add_discount( sanitize_text_field($couponForMembership) );
+
+                        $woocommerce->cart->calculate_totals();
+                        break;
+
+                        // coupon found and appied
+                        $isGotAGift = true;
+                    }
+                } // foreach
+            }
+
+        } // foreach
+    }
+
+    if ( $isGotAGift ) {
+        // redirect to Give a Gift page
+        wp_redirect( esc_url( home_url( '/' ) . 'checkout/' ) );
+        exit;
+    }
+
 }
 
 function ggContentFilter($content) {

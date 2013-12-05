@@ -22,6 +22,18 @@ function caInit() {
     }
 }
 
+/**
+ * 1 Step. User create new account
+ * - check all fields
+ * - check coupon, add to card if valid
+ * - create temp user
+ * - send email with activation link
+ *
+ * @global type $wpdb
+ * @global type $caOutput
+ * @global type $woocommerce
+ * @return type
+ */
 function caAddTempUser() {
     global $wpdb;
     global $caOutput;
@@ -31,12 +43,11 @@ function caAddTempUser() {
     $firstname = isset($_POST['firstname']) ? trim($_POST['firstname']) : '';
     $email     = isset($_POST['email']) ? trim($_POST['email']) : '';
     $password  = isset($_POST['password']) ? trim($_POST['password']) : '';
-    $passwordconfirm = isset($_POST['passwordconfirm']) ? trim($_POST['passwordconfirm']) : '';
-    // optional in case if admin added a coupon for the new user
+    //$passwordconfirm = isset($_POST['passwordconfirm']) ? trim($_POST['passwordconfirm']) : '';
+    // [optional] in case if admin added a coupon for the new user (which not exists in db) and the user create an account
     $couponCode = isset($_POST['coupon']) ? trim($_POST['coupon']) : null;
 
-
-    // allow only a-z and 0-9
+    // allow only a-zA-Z0-9_
     $firstname = preg_replace("/[^a-zA-Z0-9_\s]/", '', $firstname);
     if (!empty($couponCode)) {
         $couponCode = preg_replace("/[^a-zA-Z0-9_\s]/", '', $couponCode);
@@ -46,31 +57,36 @@ function caAddTempUser() {
         'firstname' => $firstname,
         'email'     => $email,
         'password'  => $password,
-        'passwordconfirm' => $passwordconfirm,
+        //'passwordconfirm' => $passwordconfirm,
     );
 
     $errors = caUserDataValidation($data);
 
     // check coupon
     if (!empty($couponCode)) {
-        // validate
-        $coupon = new WC_Coupon($couponCode);
-        if (!$coupon->is_valid()) {
+
+        // @todo a function
+        if ($errors) {
+            $caOutput = '<div style="color:red;"><ul>';
+            foreach ($errors as $error) {
+                $caOutput .= '<li>' . $error . '</li>';
+            }
+            $caOutput .= '</ul></div>';
+
+            add_filter('the_content', 'caContentFilter');
+
+            return;
+        }
+
+        // validate coupon
+        $coupon = new WC_Coupon( $couponCode );
+        if ( !$coupon->is_valid() ) {
             $errors['coupon'] = $coupon->get_error_message();
         } else {
-            error_log('coupon is valid:' . var_export($couponCode, 1) );
-            // buy a membership using coupon
-            global $woocommerce;
-            if (!$woocommerce->cart->add_discount( sanitize_text_field( $couponCode ))) {
-                error_log('error add coupon:' . $couponCode . ' to cart');
-                $caOutput = '<p>' . __('Something happened. Please try again.') . '</p>';
-                //$woocommerce->show_messages();
-            }
-            $woocommerce->cart->calculate_totals();
-
-            // create new permanent wp user
-            $userId = wp_create_user($tempUserExist->user_login, $tempUserExist->user_pass, $tempUserExist->user_email);
-            error_log('new user created. user id:' . var_export($userId, 1) );
+            error_log('caAddTempUser: coupon is valid:' . var_export($couponCode, 1) );
+            // Create new permanent wp user (only if the user has an invite from admin (coupon)
+            $userId = wp_create_user($firstname, $password, $email);
+            error_log('caAddTempUser: new user created. user id:' . var_export($userId, 1) );
             if ($userId) {
                 $caOutput = '<p>' . __('You have successfully created an Account') . '</p>';
                 // auto sign in
@@ -89,23 +105,20 @@ function caAddTempUser() {
                         $userId
                     )
                 );
-                // add user to pool (only once) with status = 1 (active user)
+                // add user to pool (only once) with status = 0 (user IN POOL)
                 if (!$row) {
                     // generate a key for invite page
-                    $gift_key = wp_generate_password(20, false);
+                    $gift_key = wp_generate_password( 20, false );
                     $created = time();
                     $wpdb->insert(
                         $wpdb->prefix . 'users_pool',
-                        array('ID' => $userId, 'status' => 1, 'gift_key' => $gift_key, 'created' => $created),
+                        array('ID' => $userId, 'status' => 0, 'gift_key' => $gift_key, 'created' => $created),
                         array('%d', '%d', '%s', '%d')
                     );
                 }
 
-                // send email
-                
-
-                // redirect to my-account page
-                wp_redirect( esc_url( home_url( '/' ) . 'my-account/' ) );
+                // @todo redirect to checkout page
+                wp_redirect( esc_url( home_url( '/' ) . 'cart/?coupon=' . $couponCode ) );
                 exit;
 
             } else {
@@ -114,6 +127,7 @@ function caAddTempUser() {
         }
     }
 
+    // @todo create a function
     if ($errors) {
         $caOutput = '<div style="color:red;"><ul>';
         foreach ($errors as $error) {
@@ -171,9 +185,9 @@ function caUserDataValidation($data) {
         $errors['password'] = __('Password is empty');
     } elseif (mb_strlen($data['password']) < 6) {
         $errors['password'] = __('Password must be longer than 5 characters');
-    } elseif (strcmp($data['password'], $data['passwordconfirm']) != 0) {
+    } /*elseif (strcmp($data['password'], $data['passwordconfirm']) != 0) {
         $errors['passwordconfirm'] = __('Different Passwords');
-    }
+    }*/
 
     return $errors;
 }
@@ -199,6 +213,7 @@ function caAddUser() {
             )
         );
     }
+    // , user_coupon
 
     if ($tempUserExist) {
 
@@ -206,7 +221,7 @@ function caAddUser() {
             'firstname' => $tempUserExist->user_login,
             'email'     => $tempUserExist->user_email,
             'password'  => $tempUserExist->user_pass,
-            'passwordconfirm' => $tempUserExist->user_pass,
+            //'passwordconfirm' => $tempUserExist->user_pass,
         );
 
 	$errors = caUserDataValidation($data);
@@ -225,6 +240,12 @@ function caAddUser() {
                     'remember'      => false
                 );
                 $user = wp_signon($credentials, false);
+
+                // check if user has a coupon
+                /*if (!empty($tempUserExist->user_coupon)) {
+
+                }*/
+
                 // remove temp entry
                 $wpdb->delete( $wpdb->prefix . 'users_temp', array( 'ID' => $tempUserExist->ID ), array( '%d' ) );
                 unset($tempUserExist);
