@@ -16,6 +16,7 @@ Author URI:
 define('MEMBERSHIP_GIFT_PRODUCT_ID', 637);
 define('MEMBERSHIP_PRODUCT_ID', 267); // Membership (monthly)
 
+
 $ggOutput = '';
 $ggReceiver = null;
 
@@ -27,8 +28,6 @@ add_action( 'woocommerce_thankyou', 'ggGiveGift', 10 );
 
 // On Give a Gift page add a product (gift for membership) to cart
 add_action( 'addgifttocart', 'ggAddProductToCard' );
-//add_action( 'woocommerce_before_cart', 'ggAddProductToCard' );
-//add_action( 'init', 'ggAddProductToCard' );
 
 // On Give a Gift page check the user in POOL and coupon exists then go to checkout
 add_action( 'giftproceed', 'ggGiftProceed' );
@@ -46,12 +45,12 @@ function ggGetLastReceiver() {
     global $wpdb;
     global $ggReceiver;
 
-    if (!$ggReceiver) {
+    if ( !$ggReceiver ) {
         $purchaserUserId = get_current_user_id();
 
         $ggReceiver = $wpdb->get_row(
             $wpdb->prepare(
-                "SELECT user_receiver, user_receiver_firstname, user_receiver_message FROM {$wpdb->prefix}gift_history WHERE user_purchaser = %d AND status = 0 ORDER BY updated DESC LIMIT 1",
+                "SELECT user_receiver, user_receiver_email, user_receiver_firstname, user_receiver_message FROM {$wpdb->prefix}gift_history WHERE user_purchaser = %d AND status = 0 ORDER BY updated DESC LIMIT 1",
                 $purchaserUserId
             )
         );
@@ -67,6 +66,9 @@ function ggReceiverEmail() {
     if ($ggReceiver && $ggReceiver->user_receiver) {
         $receiver = get_userdata($ggReceiver->user_receiver);
         $receiverEmail = $receiver->user_email;
+    } else if ($ggReceiver && $ggReceiver->user_receiver_email) {
+        // case when user Gave a Gift to receiver who is not registered yet
+        $receiverEmail = $ggReceiver->user_receiver_email;
     }
 
     return $receiverEmail;
@@ -93,6 +95,14 @@ function ggReceiverMessage() {
 function ggInit() {
 
     if (isset($_POST['giveGift'])) {
+
+        if ( !is_user_logged_in() ) {
+            // @todo save form fields to cookies
+
+            wp_redirect( esc_url( home_url( '/' ) . 'create-account/' ) );
+            exit;
+        }
+
         // Give a Gift form submit - save receiver data and go to checkout
         ggSaveGiftReceiver();
     }
@@ -119,7 +129,7 @@ function ggSaveGiftReceiver() {
     $message   = isset($_POST['message']) ? trim($_POST['message']) : '';
 
     // allow only a-z and 0-9
-    $firstname = preg_replace("/[^a-zA-Z0-9_\s]/", '', $firstname);
+    //$firstname = preg_replace("/[^a-zA-Z0-9_\s]/", '', $firstname);
 
     $data = array(
         'firstname' => $firstname,
@@ -147,11 +157,13 @@ function ggSaveGiftReceiver() {
     $purchaserUserId = $current_user->ID;
     $receiverUserId = email_exists($email);
     $created = time();
+
+    error_log( 'ggSaveGiftReceiver: save Gift history for receiver userId:' . var_export($receiverUserId, 1) . ' email:' . var_export($email, 1) );
     // check for exists
     $receiver = $wpdb->get_row(
         $wpdb->prepare(
-            "SELECT user_receiver, user_receiver_firstname, user_receiver_message FROM {$wpdb->prefix}gift_history WHERE user_purchaser = %d AND user_receiver = %d AND status = 0 ORDER BY id DESC LIMIT 1",
-            $purchaserUserId, $receiverUserId
+            "SELECT user_receiver, user_receiver_email, user_receiver_firstname, user_receiver_message FROM {$wpdb->prefix}gift_history WHERE user_purchaser = %d AND user_receiver_email = '%s' AND status = 0 ORDER BY id DESC LIMIT 1",
+            $purchaserUserId, $email
         ), ARRAY_A
     );
     // if already exists (e.g. second try to give a gift) then update receiver data
@@ -164,9 +176,9 @@ function ggSaveGiftReceiver() {
                 'updated'                 => $created
             ),
             array(
-                'user_purchaser' => $purchaserUserId,
-                'user_receiver'  => $receiverUserId,
-                'status'         => 0,
+                'user_purchaser'      => $purchaserUserId,
+                'user_receiver_email' => $email,
+                'status'              => 0,
             ),
             array(
                 '%s',
@@ -175,20 +187,21 @@ function ggSaveGiftReceiver() {
             ),
             array(
                 '%d',
-                '%d',
+                '%s',
                 '%d'
             )
         );
     } else {
         $wpdb->insert(
             $wpdb->prefix . 'gift_history',
-            array('user_purchaser' => $purchaserUserId, 'user_receiver' => $receiverUserId, 'user_receiver_firstname' => $firstname, 'user_receiver_message' => $message, 'status' => 0, 'created' => $created),
-            array('%d', '%d', '%s', '%s', '%d', '%d')
+            array('user_purchaser' => $purchaserUserId, 'user_receiver' => $receiverUserId, 'user_receiver_email' => $email, 'user_receiver_firstname' => $firstname, 'user_receiver_message' => $message, 'status' => 0, 'created' => $created),
+            array('%d', '%d', '%s', '%s', '%s', '%d', '%d')
         );
     }
 
     // go to checkout
-    wp_redirect( esc_url( home_url( '/' ) . 'checkout/' ) );
+    //wp_redirect( esc_url( home_url( '/' ) . 'checkout/' ) );
+    wp_redirect( esc_url( home_url( '/' ) . 'create-account/' ) );
     exit;
 }
 
@@ -220,16 +233,16 @@ function ggGiveGift( $order_id ) {
     $purchaserEmail  = $current_user->user_email;
     $purchaserUserId = $current_user->ID;
 
-    error_log( 'order id:' . var_export($order_id, 1) );
+    error_log( 'ggGiveGift: order id:' . var_export($order_id, 1) );
 
     $order = new WC_Order( $order_id );
 
     if ( $order ) {
         if ( in_array( $order->status, array( 'failed' ) ) ) {
             // error
-            error_log('order status is failed for:' . var_export($purchaserEmail, 1) );
+            error_log( 'ggGiveGift: order status is failed for:' . var_export($purchaserEmail, 1) );
         } else {
-            // check which product id in the order
+            // Check which product id in the order
             $isGift = false;
             $isMembership = false;
             $orderItems = $order->get_items();
@@ -258,7 +271,7 @@ function ggGiveGift( $order_id ) {
                 // get receiver data from database
                 $receiver = $wpdb->get_row(
                     $wpdb->prepare(
-                        "SELECT user_receiver, user_receiver_firstname, user_receiver_message FROM {$wpdb->prefix}gift_history WHERE user_purchaser = %d AND status = 0 ORDER BY id DESC LIMIT 1",
+                        "SELECT user_receiver, user_receiver_email, user_receiver_firstname, user_receiver_message FROM {$wpdb->prefix}gift_history WHERE user_purchaser = %d AND status = 0 ORDER BY id DESC LIMIT 1",
                         $purchaserUserId
                     ), ARRAY_A
                 );
@@ -267,10 +280,13 @@ function ggGiveGift( $order_id ) {
 
                 $receiverFirstname = isset($receiver['user_receiver_firstname']) ? $receiver['user_receiver_firstname'] : null;
                 $receiverUserId    = isset($receiver['user_receiver']) ? $receiver['user_receiver'] : null;
+                $receiverEmail     = isset($receiver['user_receiver_email']) ? $receiver['user_receiver_email'] : null;
                 $receiverMessage   = isset($receiver['user_receiver_message']) ? $receiver['user_receiver_message'] : null;
-                // get email by user id (receiverUserId)
-                $receiver = get_userdata($receiverUserId);
-                $receiverEmail = $receiver->email;
+                // if email is empty then get receiver email by user id
+                if ( empty( $receiverEmail ) ) {
+                    $receiver = get_userdata($receiverUserId);
+                    $receiverEmail = $receiver->email;
+                }
 
                 // update gift history
                 $wpdb->update(
@@ -319,29 +335,31 @@ function ggGiveGift( $order_id ) {
                     $gift_key = $row->gift_key;
                 }
 
-                // check if receiver in pool
-                $row = $wpdb->get_row(
-                    $wpdb->prepare(
-                        "SELECT ID, status FROM {$wpdb->prefix}users_pool WHERE ID = %d AND status = %d",
-                        $receiverUserId,
-                        0
-                    )
-                );
-                // update receiver in pool if exists and status = 0
-                if ($row) {
-                    $wpdb->update(
-                        $wpdb->prefix . 'users_pool',
-                        array(
-                            'status'  => 1,
-                            'updated' => $created
-                        ),
-                        array( 'ID' => $receiverUserId ),
-                        array(
-                            '%d',
-                            '%d'
-                        ),
-                        array( '%d' )
+                // if $receiverUserId exists in WP the check if receiver in POOL
+                if ( $receiverUserId ) {
+                    $row = $wpdb->get_row(
+                        $wpdb->prepare(
+                            "SELECT ID, status FROM {$wpdb->prefix}users_pool WHERE ID = %d AND status = %d",
+                            $receiverUserId,
+                            0
+                        )
                     );
+                    // update receiver in pool if exists and status = 0
+                    if ( $row ) {
+                        $wpdb->update(
+                            $wpdb->prefix . 'users_pool',
+                            array(
+                                'status'  => 1,
+                                'updated' => $created
+                            ),
+                            array('ID' => $receiverUserId),
+                            array(
+                                '%d',
+                                '%d'
+                            ),
+                            array('%d')
+                        );
+                    }
                 }
 
                 // 1. send an email to receiver
@@ -385,6 +403,7 @@ function ggGiveGift( $order_id ) {
                     //
                 }
             } // if ($isGift && !$isMembership) {
+
 
             // 2. User has bought a Membership
             if ( !$isGift && $isMembership ) {
@@ -435,15 +454,15 @@ function ggGiveGift( $order_id ) {
 
 }
 
-function ggUserDataValidation($data) {
+function ggUserDataValidation( $data ) {
     global $wpdb;
 
     $errors = array();
 
     if (empty($data['firstname'])) {
-        $errors['firstname'] = 'First Name is empty'; //__('Username is empty');
+        $errors['firstname'] = __('Firstname is empty');
     } elseif (mb_strlen($data['firstname']) > 60) {
-        $errors['firstname'] = __('First Name can not be longer than 60 characters');
+        $errors['firstname'] = __('Firstname can not be longer than 60 characters');
     }
 
     if (empty($data['email'])) {
@@ -460,7 +479,7 @@ function ggUserDataValidation($data) {
 
         // check user != current user
         if ($userId == get_current_user_id()) {
-            $errors['email'] = __('You can not give a gift to yourself');
+            $errors['email'] = __('You can not give a Gift to yourself');
             return $errors;
         }
 
@@ -483,16 +502,16 @@ function ggUserDataValidation($data) {
                     // user already have a Gift
                     $errors['email'] = sprintf(__('User %s has already been gifted by someone else'), $data['firstname']);
                 } else if ( $userPool['status'] == 0 ) {
-                    // user in the POOL and without Gift
+                    // user in the POOL and without Gift - OK
                 }
             }
 
         }
 
     } else {
-        // user not found, use another user
-        $errors['email'] = sprintf(__('User %s not found by email. Select another user.'), $data['firstname']);
-        error_log( 'ggUserDataValidation: User not found:' . var_export($userId, 1) );
+        // user not found by email
+        // $errors['email'] = sprintf(__('User %s not found by email. Select another user.'), $data['firstname']);
+        error_log( 'ggUserDataValidation: User does not exist with email:' . var_export($data['email'], 1) );
     }
 
     if (empty($data['message'])) {
@@ -513,10 +532,10 @@ function ggUserDataValidation($data) {
  * @param int $product_id
  */
 function ggAddProductToCard( $product_id ) {
-    error_log('ggAddProductToCard' );
+    error_log( 'ggAddProductToCard' );
 
     if ( !is_user_logged_in() ) {
-        error_log('ggAddProductToCard: user is not logged in' );
+        error_log( 'ggAddProductToCard: user is not logged in' );
         return;
     }
 
@@ -533,6 +552,9 @@ function ggAddProductToCard( $product_id ) {
             $couponCode = preg_replace( "/[^a-zA-Z0-9_\s]/", '', $couponCode );
             // validate
             $coupon = new WC_Coupon($couponCode);
+
+            error_log( 'ggAddProductToCard: coupon given, check is valid:' . var_export($couponCode, 1) );
+
             if ( !$coupon->is_valid() ) {
                 return;
             }
@@ -544,15 +566,17 @@ function ggAddProductToCard( $product_id ) {
             $purchaserUserId = get_current_user_id();
             $receiver = $wpdb->get_row(
                 $wpdb->prepare(
-                    "SELECT user_receiver, user_receiver_firstname, user_receiver_message FROM {$wpdb->prefix}gift_history WHERE user_purchaser = %d AND status = 0 ORDER BY updated DESC LIMIT 1",
+                    "SELECT user_receiver, user_receiver_email, user_receiver_firstname, user_receiver_message FROM {$wpdb->prefix}gift_history WHERE user_purchaser = %d AND status = 0 ORDER BY updated DESC LIMIT 1",
                     $purchaserUserId
                 )
             );
-            if ($receiver && $receiver->user_receiver) {
+            error_log( 'ggAddProductToCard: without coupon, check receiver:' . var_export($receiver, 1) );
+            if ( $receiver && ( $receiver->user_receiver || $receiver->user_receiver_email ) ) {
                 $productId = MEMBERSHIP_GIFT_PRODUCT_ID; // Gift Membership (monthly)
             }
         }
 
+        error_log( 'ggAddProductToCard: set productId:' . var_export($productId, 1) );
         if ( empty( $productId ) ) {
             return;
         }

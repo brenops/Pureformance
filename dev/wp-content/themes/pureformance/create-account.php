@@ -90,7 +90,7 @@ $(document).ready(function(){
                 <h2>You must be logged in to send the Gift of Opportunity</h2>
                 <div>
                     <form method="post" id="sign-in-form">
-                        <input type="text" class="input-text" name="username" id="username" placeholder="Username" />
+                        <input type="text" class="input-text" name="username" id="username" placeholder="Username or Email" />
                         <input class="input-text" type="password" name="password" id="password" placeholder="Password" />
 
                         <input type="hidden" name="redirect" value="<?php echo esc_url( home_url( '/' ) . 'give-gift/' ) ?>" />

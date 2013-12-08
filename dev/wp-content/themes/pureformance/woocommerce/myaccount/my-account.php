@@ -58,11 +58,11 @@ $woocommerce->show_messages(); ?>
         <h2>Need help getting out of the pool?</h2>
 
         <form method="POST" id="create-account-form" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">
-        <div style="float:left; width:370px;">
+        <div style="float:left; width:400px;">
             <label for="link">Your Personal Invite link (copy and paste this link to anyone)</label>
         </div>
         <div>
-            <input type="text" class="input-text" name="link" value="<?php echo home_url( '/' ) . '/give-gift/?key=' . $gift_key ?>" />
+            <input type="text" style="width:380px;" class="input-text" name="link" value="<?php echo home_url( '/' ) . 'give-gift/?key=' . $gift_key ?>" />
         </div>
         </form>
     </div>
@@ -105,12 +105,12 @@ $woocommerce->show_messages(); ?>
 
     <div class="copy">
         <form method="POST" id="create-account-form" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">
-        <div style="float:left; width:370px;">
+        <div style="float:left; width:400px;">
             <label for="link">Use this link to Your personal invite Link to help <?php echo $gifterFirstname ?> find someone
     to help him into the site (copy and paste this link to anyone)</label>
         </div>
         <div>
-            <input type="text" class="input-text" name="link" value="<?php echo home_url( '/' ) . '/give-gift/?key=' . $gift_key ?>" />
+            <input type="text" class="input-text" style="width:380px;" name="link" value="<?php echo home_url( '/' ) . 'give-gift/?key=' . $gift_key ?>" />
         </div>
         </form>
     </div>

@@ -137,7 +137,7 @@
                     	<a href="<?php echo wp_logout_url(home_url( '/' )); ?>">Logout</a>
                     </div> -->
                     <form method="post" class="">
-                            <input type="text" class="input-text" name="username" id="username" placeholder="Username" />
+                            <input type="text" class="input-text" name="username" id="username" placeholder="Username or Email" />
                             <input class="input-text" type="password" name="password" id="password" placeholder="Password" />
 
                             <div class="form-row">
@@ -170,7 +170,7 @@
 	<div id="members-only" class="ask-expert-popup">
 		<h2>Please log in to access this content.</h2>
 		<form method="post" class="">
-			<input type="text" class="input-text" name="username" id="username" placeholder="Username" />
+			<input type="text" class="input-text" name="username" id="username" placeholder="Username or Email" />
 			<input class="input-text" type="password" name="password" id="password" placeholder="Password" />
 			<div class="form-row">
 				<?php global $woocommerce; ?>

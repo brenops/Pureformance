@@ -1,10 +1,12 @@
 <?php
 // Template Name: Give the Gift
 
-if ( !is_user_logged_in() ) {
+if ( !is_user_logged_in() && !isset($_GET['key']) ) {
     header( 'Location: ' . home_url( '/' ) . 'create-account/' );
     exit;
 }
+
+// preload from cookies
 
 // preload information about user
 $firstname = '';
