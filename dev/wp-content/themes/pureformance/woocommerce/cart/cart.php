@@ -11,8 +11,14 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 global $woocommerce;
 
+if ( isset($_GET['coupon']) ) {
+    // Add a Membership (product) to cart of current user
+    do_action( 'addgifttocart' );
+}
+
 $woocommerce->show_messages();
 ?>
+
 <?php do_action( 'woocommerce_before_cart' ); ?>
 
 <form action="<?php echo esc_url( $woocommerce->cart->get_cart_url() ); ?>" method="post">

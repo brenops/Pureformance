@@ -9,6 +9,10 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
+if ( isset($_GET['coupon']) ) {
+    // Add a Membership (product) to cart of current user
+    do_action( 'addgifttocart' );
+}
 ?>
 
 <p><?php _e( 'Your cart is currently empty.', 'woocommerce' ) ?></p>
