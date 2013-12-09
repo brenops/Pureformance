@@ -2,7 +2,7 @@
 	<li>
     	<img src="<?php bloginfo( 'template_directory' ); ?>/images/icon-shopping.png" />
         <span>Shop Products</span>
-    	<a href="<?php echo home_url( '/' ); ?>shop/" class="over">
+    	<a href="<?php echo home_url( '/' ); ?>products/" class="over">
         	<h2>Shop Products</h2>
         	<p>Take a look at our innovative products purely designed to help you succeed. We don’t compromise, we strive to make the benefits to you our highest priority!</p>
         </a>
@@ -10,7 +10,7 @@
     <li>
     	<img src="<?php bloginfo( 'template_directory' ); ?>/images/icon-write.png" />
         <span>Community</span>
-        <a href="<?php echo home_url( '/' ); ?>blog/" class="over">
+        <a href="<?php echo home_url( '/' ); ?>community/" class="over">
         	<h2>Community</h2>
         	<p>Visit the heartbeat of our community. Find features, interviews, new ideas, upcoming events and contests, stories, community submitted content and more.</p>
         </a>

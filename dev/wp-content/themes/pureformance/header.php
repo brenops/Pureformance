@@ -10,12 +10,12 @@
 	foreach ( $subscriptions as $subscription_key => $subscription_details ) {
 		if ( $subscription_details['status'] == 'trash' ) {
 			unset( $subscriptions[$subscription_key] );
-                }
+        }
                 //print_r($subscription_details);
 		if ( $subscription_details['status'] == 'active' ) {
                     $_SESSION['is_subscriber'] = 1;
-                }
         }
+    }
 	// print_r($_SESSION);
 	//----------------------------------------------------------------------------------
 ?>
@@ -23,7 +23,7 @@
 <html <?php language_attributes(); ?>>
 <head>
 <meta charset="<?php bloginfo( 'charset' ); ?>" />
-<link rel="icon" href="http://pureformance.com/dev/favicon.ico" type="image/x-icon"> 
+<link rel="icon" href="http://pureformance.com/favicon.ico" type="image/x-icon"> 
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
 <title><?php
 	/*
@@ -60,6 +60,7 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 <script src="<?php bloginfo( 'template_directory' ); ?>/js/main.js" type="text/javascript"></script>
 <script src="<?php bloginfo( 'template_directory' ); ?>/js/contact.js" type="text/javascript"></script>
+<script src="<?php bloginfo( 'template_directory' ); ?>/js/notification.js" type="text/javascript"></script>
 <script src="<?php bloginfo( 'template_directory' ); ?>/js/ask-expert.js" type="text/javascript"></script>
 <script src="<?php bloginfo( 'template_directory' ); ?>/js/superfish.js" type="text/javascript"></script>
 <script src="<?php bloginfo( 'template_directory' ); ?>/js/fancybox/jquery.fancybox-1.3.4.js" type="text/javascript"></script>
@@ -83,15 +84,6 @@
 			}
 		}
 	});	
-</script>
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)
-[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-ga('create', 'UA-44954629-1', 'pureformance.com');
-ga('send', 'pageview');
 </script>
 <?php if (is_home()) { ?>
     <script language="javascript">
@@ -118,34 +110,30 @@ ga('send', 'pageview');
 <?php } ?>
 </head>
 
-<body id="<?php echo the_slug(); ?>" <?php body_class(); ?> <?php if ( is_home() ) { echo 'oncontextmenu="return false"'; } ?>>
-<?php if ( !is_home() ) { ?>
+<body id="<?php echo the_slug(); ?>" <?php body_class(); ?> <?php //if ( is_home() ) { echo 'oncontextmenu="return false"'; } ?>>
 <div id="header">
 	<div class="wrapper">
         <div id="mobile-nav">
 		    <ul>
 		        <li><a href="<?php echo home_url( '/' ); ?>strategies/">Strategies</a></li>
-	        	<li><a href="<?php echo home_url( '/' ); ?>blog/">Community & Features</a></li>
-	        	<li><a href="<?php echo home_url( '/' ); ?>shop/">Products</a></li>
+	        	<li><a href="<?php echo home_url( '/' ); ?>community/">Community & Features</a></li>
+	        	<li><a href="<?php echo home_url( '/' ); ?>products/">Products</a></li>
 	        	<li><a href="<?php echo home_url( '/' ); ?>about-us/">About Us</a></li>
 	        	<li><a href="<?php echo home_url( '/' ); ?>cart/" class="icon">View Cart</a></li>
-            	<li><a href="<?=home_url( '/' )?>my-account" class="icon"><?=(is_user_logged_in() ? 'My Account' : 'Sign in')?></a></li>
+            	<!-- <li><a href="<?=home_url( '/' )?>my-account" class="icon"><?=(is_user_logged_in() ? 'My Account' : 'Sign in')?></a></li> -->
             	<?php if(is_user_logged_in()){ ?><li><a href="<?php echo wp_logout_url(home_url( '/' )); ?>" class="icon">Sign Out</a></li><? } ?>
-            <?php if ($_SESSION['is_subscriber']==0) {?><li class="membership"><a href="<?=home_url( '/' )?>membership/">Give the Gift</a></li><? } ?>
+            <?php if ($_SESSION['is_subscriber']==0) {?><!-- <li class="membership"><a href="<?=home_url( '/' )?>membership/">Give the Gift</a></li> --><? } ?>
 
 		    </ul>
 	    </div>
         <a href="<?php echo home_url( '/' ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home" class="logo"><span>Pure</span>formance</a>
         <ul class="site-top-links">
-            <?php //if (!is_user_logged_in() || $_SESSION['is_subscriber']==0) { ?><!-- <li class="joinus"><a href="#signup-form" id="signup">Join Us</a></li> --><?php //} ?>
-            <?php if (the_slug() == "blog" || is_category() || $post && $post->post_type == "post") { ?>
-                <!--li class="categories"><a href="">Categories</a-->
-                    <?php wp_list_categories('orderby=name&exclude=1,4,5&title_li=<a href="">Categories</a>'); ?>
-                <!--</li>-->
+            <?php if ((the_slug() == "community" || is_category() || $post && $post->post_type == "post") && !is_home()) { ?>
+                <?php wp_list_categories('orderby=name&exclude=1,4,5&title_li=<a href="">Categories</a>'); ?>
                 <li class="tags"><a href="javascript:void(0);" class="icon">Tags</a>
                     <ul>
                     <?php
-                    $tags = get_tags( array('order' => 'ASC') );
+                    $tags = get_tags( array('number' => 15) );
                     foreach ( (array) $tags as $tag ) {
                         echo '<li><a href="' . get_tag_link( $tag->term_id ) . '" title="' . sprintf( __( "View all posts in %s" ), $tag->name ) . '" >' . $tag->name . '</a></li>';
                     }
@@ -155,7 +143,7 @@ ga('send', 'pageview');
             <?php } ?>
             <li class="cart"><a href="<?php echo home_url( '/' ); ?>cart/" class="icon">View Cart</a></li>
 
-            <li class="signin"><a href="<?php echo home_url( '/' ) ?>my-account" class="icon"><?php echo (is_user_logged_in() ? 'My Account' : 'Sign in') ?></a>
+            <!-- <li class="signin"><a href="<?php echo home_url( '/' ) ?>my-account" class="icon"><?php echo (is_user_logged_in() ? 'My Account' : 'Sign in') ?></a>
             	<?php if ( !is_user_logged_in() ) { ?>
             	<ul class="popup">
                     <h2>My Account</h2>
@@ -182,19 +170,20 @@ ga('send', 'pageview');
 					</form>
                 </ul>
                 <?php } ?>
-            </li>
+            </li> -->
             <?php if(is_user_logged_in()){ ?><li class="signout"><a href="<?php echo wp_logout_url(home_url( '/' )); ?>" class="icon">Sign Out</a></li><? } ?>
-            <?php if ($_SESSION['is_subscriber']==0) {?><li class="joinus"><a href="<?=home_url( '/' )?>membership/">Give the Gift</a></li><? } ?>
+            <?php if ($_SESSION['is_subscriber']==0) {?><!-- <li class="joinus"><a href="<?=home_url( '/' )?>membership/">Give the Gift</a></li> --><? } ?>
         </ul>
         <div class="clear"></div>
     </div>
 </div>
 <a href="#members-only" id="members-only-trigger"></a>
 <div style="display:none">
-	<div id="members-only" class="ask-expert-popup">
+	<!--
+<div id="members-only" class="ask-expert-popup">
 		<h2>Please log in to access this content.</h2>
 		<form method="post" class="">
-			<input type="text" class="input-text" name="username" id="username" placeholder="Username or Email" />
+			<input type="text" class="input-text" name="username" id="username" placeholder="Username" />
 			<input class="input-text" type="password" name="password" id="password" placeholder="Password" />
 			<div class="form-row">
 				<?php global $woocommerce; ?>
@@ -209,6 +198,7 @@ ga('send', 'pageview');
 					echo esc_url( get_permalink( $lost_password_page_id ) );
                                 } else {
 					echo esc_url( wp_lostpassword_url( home_url() ) );
+				}
 				?>">Forgot Password?</a>
 			</div>
 			<div class="clear"></div>
@@ -217,6 +207,22 @@ ga('send', 'pageview');
 We offer monthly and annual membership packages!</p>
 			<center><a href="<?php echo home_url( '/' ); ?>membership/" class="btn2" style="display:inline-block"><span>Join Now</span></a></center>
 			</div>
+		</form>
+	</div>
+-->
+<div id="members-only" class="ask-expert-popup">
+		<h2>Whoa Nelly!</h2>
+		<p>You can be the first one out of the gate and see this content soon.</p>
+
+		<p>Sign up to be notified when our game changing "give the gift" initiative goes live this week. Then you'll be off and running!</p>
+		<form method="post" class="" id="notified">
+			<div id="form-error"></div>
+			<div class="form-row">
+				<input name="email_address" type="text">
+				<a href="javascript:void(0)" id="submitNotification" class="btn1">Register</a>
+			</div>
+			<div class="clear"></div>
+			<p>For questions, comments, or feedback, <a href="<?php echo home_url( '/' ); ?>contact-us/">click here to Contact Us</a></p>
 		</form>
 	</div>
 </div>
@@ -231,18 +237,19 @@ We offer monthly and annual membership packages!</p>
     </h2>
     <ul class="menu" id="menu-side-menu">
             <li><a href="<?php echo home_url( '/' ); ?>strategies/">Strategies</a></li>
-            <li><a href="<?php echo home_url( '/' ); ?>blog/">Community & Features</a></li>
-            <li><a href="<?php echo home_url( '/' ); ?>shop/">Products</a></li>
-            <?php if (is_home()) { ?><!-- <li><a href="javascript:void(0)">Login/Sign Up</a></li> --><?php } ?>
+            <li><a href="<?php echo home_url( '/' ); ?>community/">Community & Features</a></li>
+            <li><a href="<?php echo home_url( '/' ); ?>products/">Products</a></li>
             <li><a href="<?php echo home_url( '/' ); ?>about-us/">About Us</a></li>
     </ul>
     <?php if ($_SESSION['is_subscriber'] == 0) { ?>
-    <div class="sign-up">
+    <!--
+<div class="sign-up">
         <a href="<?php echo home_url( '/' ); ?>membership/">
             <h2>We Want You To Succeed!<span>Join Now</span></h2>
         </a>
         <div class="clear"></div>
     </div>
+-->
     <?php } ?>
     </div>
 </div>

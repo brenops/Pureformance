@@ -233,8 +233,8 @@ function the_slug() {
 function change_post_menu_label() {
     global $menu;
     global $submenu;
-    $menu[5][0] = 'Blog';
-    $submenu['edit.php'][5][0] = 'Blog Posts';
+    $menu[5][0] = 'Community';
+    $submenu['edit.php'][5][0] = 'Community Posts';
     $submenu['edit.php'][10][0] = 'Add Post';
     echo '';
 }
@@ -385,5 +385,87 @@ function my_login_logo() { ?>
         }
     </style>
 <?php }
-//add_action( 'login_enqueue_scripts', 'my_login_logo' );
+add_action( 'login_enqueue_scripts', 'my_login_logo' );
+
+/**
+ * Returns all the orders made by the user
+ *
+ * @param int $user_id
+ * @param string $status (completed|processing|canceled|on-hold etc)
+ * @return array of order ids
+ */
+function get_all_user_orders($user_id,$status='completed'){
+    if(!$user_id)
+        return false;
+    
+    $orders=array();//order ids
+     
+    $args = array(
+        'numberposts'     => -1,
+        'meta_key'        => '_customer_user',
+        'meta_value'      => $user_id,
+        'post_type'       => 'shop_order',
+        'post_status'     => 'publish',
+        'tax_query'=>array(
+                array(
+                    'taxonomy'  =>'shop_order_status',
+                    'field'     => 'slug',
+                    'terms'     =>$status
+                    )
+        )  
+    );
+    
+    $posts=get_posts($args);
+    //get the post ids as order ids
+    $orders=wp_list_pluck( $posts, 'ID' );
+    
+    return $orders;
+ 
+}
+
+/**
+ * Get all Products Successfully Ordered by the user
+ *
+ * @global type $wpdb
+ * @param int $user_id
+ * @return bool|array false if no products otherwise array of product ids
+ */
+function get_all_products_ordered_by_user($user_id=false,$status='completed'){
+ 
+ $orders=get_all_user_orders($user_id,$status);
+ if(empty($orders))
+   return false;
+ 
+ $order_list='('.join(',', $orders).')';//let us make a list for query
+ 
+ //so we have all the orders made by this user which was successfull
+ 
+ //we need to find the products in these order and make sure they are downloadable
+ 
+ // find all products in these order
+ 
+ global $wpdb;
+ $query_select_order_items="SELECT order_item_id as id FROM {$wpdb->prefix}woocommerce_order_items WHERE order_id IN {$order_list}";
+ 
+ $query_select_product_ids="SELECT meta_value as product_id FROM {$wpdb->prefix}woocommerce_order_itemmeta WHERE meta_key=%s AND order_item_id IN ($query_select_order_items)";
+ 
+ $products=$wpdb->get_col($wpdb->prepare($query_select_product_ids,'_product_id'));
+ 
+ return $products;
+}
+
+/**
+ * has the user bought the product
+ * @param type $user_id
+ * @param type $product_id
+ * @return boolean
+ */
+function has_user_bought($user_id,$product_id){
+ $ordered_products=get_all_products_ordered_by_user($user_id);
+ 
+ if(in_array($product_id, (array)$ordered_products))
+   return true;
+ return false;
+ 
+}
 
