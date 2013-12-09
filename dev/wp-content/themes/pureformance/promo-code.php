@@ -1,7 +1,7 @@
 <?php
 // Template Name: Promo-code
 
-// get coupon code from GET request
+// Get coupon code from GET request
 $couponCode = isset($_GET['coupon']) ? trim($_GET['coupon']) : null;
 $couponCode = preg_replace("/[^a-zA-Z0-9_\s]/", '', $couponCode);
 

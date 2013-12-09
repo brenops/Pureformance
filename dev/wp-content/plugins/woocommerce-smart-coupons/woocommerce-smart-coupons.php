@@ -2588,6 +2588,7 @@ if ( is_woocommerce_active() ) {
                 if ( !empty( $order_id ) ) {
                     $receivers_messages = get_post_meta( $order_id, 'gift_receiver_message', true );
                 }
+
                             foreach ( $emails as $email_id => $qty ) {
 
                                 if ( $this->is_credit_sent( $email_id, $coupon ) ) continue;
@@ -2975,7 +2976,7 @@ if ( is_woocommerce_active() ) {
                         }
 
                         //
-                        function send_gift_certificate( $email, $amount ){
+                        function send_gift_certificate( $email, $amount ) {
                                 global $woocommerce;
 
                                 $emails = explode( ',', $email );

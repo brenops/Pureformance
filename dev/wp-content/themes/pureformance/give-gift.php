@@ -1,10 +1,12 @@
 <?php
 // Template Name: Give the Gift
 
-if ( !is_user_logged_in() ) {
+if ( !is_user_logged_in() && !isset($_GET['key']) ) {
     header( 'Location: ' . home_url( '/' ) . 'create-account/' );
     exit;
 }
+
+// preload from cookies
 
 // preload information about user
 $firstname = '';
@@ -21,7 +23,7 @@ if (isset($_GET['key'])) {
             0
         )
     );
-    if ($row && $row->ID) {
+    if ( $row && $row->ID ) {
         $receiver = get_userdata($row->ID);
 
         $firstname = !empty($receiver->user_nicename) ? $receiver->user_nicename : $receiver->user_login;
@@ -29,8 +31,10 @@ if (isset($_GET['key'])) {
     }
 }
 
-// add membership to cart of current user
+// Add a Gift Membership to cart of current user
 do_action( 'addgifttocart' );
+// Check if user has coupon (gift) and in POOL then go to checkout to buy a Membership
+do_action( 'giftproceed' );
 
 get_header();
 

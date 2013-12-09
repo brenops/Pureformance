@@ -3,19 +3,19 @@
 
 $firstname = null;
 $email = null;
-// get coupon code
+// Get coupon code and check
 $couponCode = null;
-if (isset($_GET['coupon'])) {
+if ( isset($_GET['coupon']) ) {
     $couponCode = trim($_GET['coupon']);
     $couponCode = preg_replace("/[^a-zA-Z0-9_\s]/", '', $couponCode);
 
-    $coupon = new WC_Coupon($couponCode);
-    if ($coupon && $coupon->is_valid() && isset($coupon->customer_email)) {
+    $coupon = new WC_Coupon( $couponCode );
+    if ( $coupon && $coupon->is_valid() && isset($coupon->customer_email) ) {
         $email = is_array($coupon->customer_email) ? $coupon->customer_email[0] : '';
     }
 
-    // add membership to cart of current user
-    do_action( 'addgifttocart' );
+    // Add a Membership (product) to cart of current user
+    //do_action( 'addgifttocart' );
 }
 
 if ( is_user_logged_in() ) {
@@ -50,7 +50,7 @@ $(document).ready(function(){
                 <form method="POST" id="create-account-form" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">
                 <input type="hidden" name="coupon" value="<?php echo isset($couponCode) ? esc_attr($couponCode) : '' ?>" />
                 <div style="float:left; width:270px;">
-                    <label for="firstname">Username:</label>
+                    <label for="firstname">First Name:</label>
                 </div>
                 <div>
                     <input type="text" class="input-text" name="firstname" id="ca-firstname" value="<?php echo isset($firstname) ? esc_attr($firstname) : '' ?>" />
@@ -68,12 +68,12 @@ $(document).ready(function(){
                 <div>
                     <input type="password" class="input-text" name="password" id="ca-password" value="" />
                 </div>
-                <div style="float:left; width:270px;">
+                <!--<div style="float:left; width:270px;">
                     <label for="passwordconfirm">Confirm Password:</label>
                 </div>
                 <div>
                     <input type="password" class="input-text" name="passwordconfirm" id="ca-passwordconfirm" value="" />
-                </div>
+                </div>-->
 
                 <div style="float:left; width:270px;">
                     Already have an account? <a href="#sign-in" id="sign-in-trigger" style="text-decoration:underline;">Sign In</a>
@@ -90,7 +90,7 @@ $(document).ready(function(){
                 <h2>You must be logged in to send the Gift of Opportunity</h2>
                 <div>
                     <form method="post" id="sign-in-form">
-                        <input type="text" class="input-text" name="username" id="username" placeholder="Username" />
+                        <input type="text" class="input-text" name="username" id="username" placeholder="Username or Email" />
                         <input class="input-text" type="password" name="password" id="password" placeholder="Password" />
 
                         <input type="hidden" name="redirect" value="<?php echo esc_url( home_url( '/' ) . 'give-gift/' ) ?>" />
