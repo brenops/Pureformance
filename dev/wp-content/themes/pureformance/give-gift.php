@@ -8,18 +8,18 @@ if ( !is_user_logged_in() && !isset($_GET['key']) ) {
 
 // preload from cookies
 
-// preload information about user
+// preload information about user which need a help
 $firstname = '';
 $email     = '';
 if (isset($_GET['key'])) {
     global $wpdb;
-    $gift_key = trim($_GET['key']);
-    $gift_key = preg_replace("/[^a-zA-Z0-9_\s]/", '', $gift_key);
+    $giftKey = trim($_GET['key']);
+    $giftKey = preg_replace("/[^a-zA-Z0-9_\s]/", '', $giftKey);
     // get user from pool by gift key (unique key for user in pool)
     $row = $wpdb->get_row(
         $wpdb->prepare(
             "SELECT ID, status FROM {$wpdb->prefix}users_pool WHERE gift_key = %s AND status = %d",
-            $gift_key,
+            $giftKey,
             0
         )
     );

@@ -191,7 +191,7 @@ function caAddTempUser() {
             array('%s', '%s', '%s', '%s', '%d')
         );
 
-        wp_mail($email, __('Registration'), "Welcome {$firstname}, Your password: {$password}. For activation go to: " . home_url( '/' ) . '?c=' . $code);
+        wp_mail($email, __('Registration'), "Welcome {$firstname}! For activation go to: " . home_url( '/' ) . '?c=' . $code);
 
         $caOutput = '<p>You have been successfully registered. Check Your Email To Activate Your Account.</p>';
                 //. home_url( '/' ) . '?c=' . $code;

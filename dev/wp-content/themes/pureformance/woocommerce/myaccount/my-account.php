@@ -22,15 +22,18 @@ $row = $wpdb->get_row(
 );
 
 $is_user_in_pool = (isset($row) && $row->status == 0);
-$gifted_count    = 0;
+$giftedCount    = 0;
 $gifterFirstname = '';
-$gift_key        = '';
+$giftKey         = '';
 
 if ($row) {
     // gift key for sharing
-    $gift_key = $row->gift_key;
+    $giftKey = $row->gift_key;
+    $receiver = get_userdata($userId);
+    $gifterFirstname = !empty($receiver->display_name) ? $receiver->display_name : $receiver->user_login;
+
     // how many users were gifted
-    $gifted_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}gift_history WHERE user_purchaser = {$userId} AND status = 1 AND order_id IS NOT NULL" );
+    $giftedCount = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}gift_history WHERE user_purchaser = {$userId} AND status = 1 AND order_id IS NOT NULL" );
 
     if ($row->status == 1) {
         //
@@ -40,6 +43,15 @@ if ($row) {
 
 $woocommerce->show_messages(); ?>
 
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=650155288367842";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 <p class="myaccount_user">
     <?php
     printf(
@@ -50,7 +62,7 @@ $woocommerce->show_messages(); ?>
     ?>
 </p>
 
-<p class="myaccount_user">You have gifted <?php echo $gifted_count ?> people so far. <?php echo $gifted_count > 0 ? 'Great work!' : '' ?></p>
+<p class="myaccount_user">You have gifted <?php echo $giftedCount ?> people so far. <?php echo $giftedCount > 0 ? 'Great work!' : '' ?></p>
 
 <?php if ($is_user_in_pool) : ?>
 
@@ -62,9 +74,19 @@ $woocommerce->show_messages(); ?>
             <label for="link">Your Personal Invite link (copy and paste this link to anyone)</label>
         </div>
         <div>
-            <input type="text" style="width:380px;" class="input-text" name="link" value="<?php echo home_url( '/' ) . 'give-gift/?key=' . $gift_key ?>" />
+            <input type="text" style="width:380px;" class="input-text" name="link" value="<?php echo home_url( '/' ) . 'friend-help/?key=' . $giftKey ?>" />
         </div>
         </form>
+    </div>
+    <div class="clear"></div>
+
+    <div class="copy">
+        <div style="float:left; margin:5px 20px;">
+            <div class="fb-share-button" data-href="<?php echo home_url( '/' ) . 'friend-help/?key=' . $giftKey ?>" data-width="300" data-type="box_count"></div>
+        </div>
+        <div style="float:left; margin:5px 20px;">
+            <a href="https://twitter.com/share" class="twitter-share-button" data-url="<?php echo home_url( '/' ) . 'friend-help/?key=' . $giftKey ?>" data-via="Pureformance" data-lang="en" data-text="Help to <?php echo isset($gifterFirstname) ? esc_attr( $gifterFirstname ) : '' ?>" data-count="vertical">Tweet</a>
+        </div>
     </div>
     <div class="clear"></div>
 
@@ -110,7 +132,7 @@ $woocommerce->show_messages(); ?>
     to help him into the site (copy and paste this link to anyone)</label>
         </div>
         <div>
-            <input type="text" class="input-text" style="width:380px;" name="link" value="<?php echo home_url( '/' ) . 'give-gift/?key=' . $gift_key ?>" />
+            <input type="text" class="input-text" style="width:380px;" name="link" value="<?php echo home_url( '/' ) . 'friend-help/?key=' . $giftKey ?>" />
         </div>
         </form>
     </div>
