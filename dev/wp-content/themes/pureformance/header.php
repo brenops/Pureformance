@@ -120,9 +120,9 @@
 	        	<li><a href="<?php echo home_url( '/' ); ?>products/">Products</a></li>
 	        	<li><a href="<?php echo home_url( '/' ); ?>about-us/">About Us</a></li>
 	        	<li><a href="<?php echo home_url( '/' ); ?>cart/" class="icon">View Cart</a></li>
-            	<!-- <li><a href="<?=home_url( '/' )?>my-account" class="icon"><?=(is_user_logged_in() ? 'My Account' : 'Sign in')?></a></li> -->
+            	<li><a href="<?=home_url( '/' )?>my-account" class="icon"><?=(is_user_logged_in() ? 'My Account' : 'Sign in')?></a></li>
             	<?php if(is_user_logged_in()){ ?><li><a href="<?php echo wp_logout_url(home_url( '/' )); ?>" class="icon">Sign Out</a></li><? } ?>
-            <?php if ($_SESSION['is_subscriber']==0) {?><!-- <li class="membership"><a href="<?=home_url( '/' )?>membership/">Give the Gift</a></li> --><? } ?>
+            <?php if ($_SESSION['is_subscriber']==0) {?><li class="membership"><a href="<?=home_url( '/' )?>membership/">Give the Gift</a></li><? } ?>
 
 		    </ul>
 	    </div>
@@ -143,7 +143,7 @@
             <?php } ?>
             <li class="cart"><a href="<?php echo home_url( '/' ); ?>cart/" class="icon">View Cart</a></li>
 
-            <!-- <li class="signin"><a href="<?php echo home_url( '/' ) ?>my-account" class="icon"><?php echo (is_user_logged_in() ? 'My Account' : 'Sign in') ?></a>
+            <li class="signin"><a href="<?php echo home_url( '/' ) ?>my-account" class="icon"><?php echo (is_user_logged_in() ? 'My Account' : 'Sign in') ?></a>
             	<?php if ( !is_user_logged_in() ) { ?>
             	<ul class="popup">
                     <h2>My Account</h2>
@@ -170,17 +170,16 @@
 					</form>
                 </ul>
                 <?php } ?>
-            </li> -->
+            </li>
             <?php if(is_user_logged_in()){ ?><li class="signout"><a href="<?php echo wp_logout_url(home_url( '/' )); ?>" class="icon">Sign Out</a></li><? } ?>
-            <?php if ($_SESSION['is_subscriber']==0) {?><!-- <li class="joinus"><a href="<?=home_url( '/' )?>membership/">Give the Gift</a></li> --><? } ?>
+            <?php if ($_SESSION['is_subscriber']==0) {?>\<li class="joinus"><a href="<?=home_url( '/' )?>membership/">Give the Gift</a></li><? } ?>
         </ul>
         <div class="clear"></div>
     </div>
 </div>
 <a href="#members-only" id="members-only-trigger"></a>
 <div style="display:none">
-	<!--
-<div id="members-only" class="ask-expert-popup">
+	<div id="members-only" class="ask-expert-popup">
 		<h2>Please log in to access this content.</h2>
 		<form method="post" class="">
 			<input type="text" class="input-text" name="username" id="username" placeholder="Username" />
@@ -209,22 +208,6 @@ We offer monthly and annual membership packages!</p>
 			</div>
 		</form>
 	</div>
--->
-<div id="members-only" class="ask-expert-popup">
-		<h2>Whoa Nelly!</h2>
-		<p>You can be the first one out of the gate and see this content soon.</p>
-
-		<p>Sign up to be notified when our game changing "give the gift" initiative goes live this week. Then you'll be off and running!</p>
-		<form method="post" class="" id="notified">
-			<div id="form-error"></div>
-			<div class="form-row">
-				<input name="email_address" type="text">
-				<a href="javascript:void(0)" id="submitNotification" class="btn1">Register</a>
-			</div>
-			<div class="clear"></div>
-			<p>For questions, comments, or feedback, <a href="<?php echo home_url( '/' ); ?>contact-us/">click here to Contact Us</a></p>
-		</form>
-	</div>
 </div>
 <div id="side">
     <div id="hideside"></div>
@@ -242,14 +225,12 @@ We offer monthly and annual membership packages!</p>
             <li><a href="<?php echo home_url( '/' ); ?>about-us/">About Us</a></li>
     </ul>
     <?php if ($_SESSION['is_subscriber'] == 0) { ?>
-    <!--
-<div class="sign-up">
+	<div class="sign-up">
         <a href="<?php echo home_url( '/' ); ?>membership/">
             <h2>We Want You To Succeed!<span>Join Now</span></h2>
         </a>
         <div class="clear"></div>
     </div>
--->
     <?php } ?>
     </div>
 </div>
