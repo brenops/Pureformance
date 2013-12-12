@@ -127,7 +127,9 @@ function ggSaveGiftReceiver() {
     $firstname = isset($_POST['firstname']) ? trim($_POST['firstname']) : '';
     $email     = isset($_POST['email']) ? trim($_POST['email']) : '';
     $message   = isset($_POST['message']) ? trim($_POST['message']) : '';
+    $isRandom  = isset($_POST['random']) ? intval($_POST['random']) : null;
 
+    error_log('ggSaveGiftReceiver: isRandom:' . var_export($isRandom, 1) );
     // allow only a-z and 0-9
     //$firstname = preg_replace("/[^a-zA-Z0-9_\s]/", '', $firstname);
 
@@ -137,9 +139,72 @@ function ggSaveGiftReceiver() {
         'message'   => $message
     );
 
-    $errors = ggUserDataValidation($data);
+    if ( $isRandom ) {
+        // get random user from POOL (the oldest user)
+        if ( $wpdb && $wpdb->prefix ) {
+                // select the oldest user from POOL
+                $userPool = $wpdb->get_row(
+                    "SELECT ID, status FROM {$wpdb->prefix}users_pool WHERE status = 0 ORDER BY created LIMIT 1",
+                    ARRAY_A
+                );
 
-    if ($errors) {
+                error_log( 'ggSaveGiftReceiver: get from POOL:' . var_export($userPool, 1) );
+
+                if ( $userPool && !empty($userPool['ID']) ) {
+                    $userId = intval($userPool['ID']);
+                    $receiver = get_userdata($userId);
+                    error_log( 'ggSaveGiftReceiver: userId:' . $userId . ' receiver:' . var_export($receiver, 1) );
+
+                    $firstname = !empty($receiver->display_name) ? $receiver->display_name : $receiver->user_login;
+                    $email     = $receiver->user_email;
+                    $data = array(
+                        'firstname' => $firstname,
+                        'email'     => $email,
+                        'message'   => _('Here is my Gift for you')
+                    );
+                    error_log( 'ggSaveGiftReceiver: prepare data:' . var_export($data, 1) );
+                } else {
+                    error_log( 'ggSaveGiftReceiver: POOL is empty' );
+                    // no one in the POOL
+                    wp_redirect( esc_url( home_url( '/' ) . 'give-gift/?random=false' ) );
+                    exit;
+                }
+            }
+    } else {
+        // check if user already gifted by another user
+        // add check is the user in the POOL?
+        $userId = email_exists($data['email']);
+        if ( $userId ) {
+            error_log( 'ggSaveGiftReceiver: check POOL for user id:' . var_export($userId, 1) );
+
+            // check if user in POOL
+            if ( $wpdb && $wpdb->prefix ) {
+                $userPool = $wpdb->get_row(
+                    $wpdb->prepare(
+                        "SELECT ID, status FROM {$wpdb->prefix}users_pool WHERE ID = %d",
+                        $userId
+                    ),
+                    ARRAY_A
+                );
+
+                error_log( 'ggSaveGiftReceiver: get from POOL:' . var_export($userPool, 1) );
+
+                if ( isset($userPool['status']) ) {
+                    // if user gifted by someone else
+                    if ( $userPool['status'] == 1 ) {
+                        //$data['firstname'];
+                        // redirect with random flag
+                        wp_redirect( esc_url( home_url( '/' ) . 'give-gift/?random=1' ) );
+                        exit;
+                    }
+                }
+            }
+        }
+    }
+
+    $errors = ggUserDataValidation( $data, $isRandom );
+
+    if ( $errors ) {
         $ggOutput = '<div style="color:red;"><ul>';
         foreach ($errors as $error) {
             $ggOutput .= '<li>' . $error . '</li>';
@@ -473,8 +538,15 @@ function ggUserDataValidation( $data ) {
         $errors['email'] = __('Provided incorrect Email address');
     }
 
-    // add check is the user in the POOL?
+    // check user != current user
     $userId = email_exists($data['email']);
+    if ($userId == get_current_user_id()) {
+        $errors['email'] = __('You can not give a Gift to yourself');
+        return $errors;
+    }
+
+    // add check is the user in the POOL?
+    /*$userId = email_exists($data['email']);
     if ($userId) {
 
         // check user != current user
@@ -485,7 +557,7 @@ function ggUserDataValidation( $data ) {
 
         error_log( 'ggUserDataValidation: check POOL for user id:' . var_export($userId, 1) );
 
-        // check if user in pool, we can give a gift only for users in pool
+        // check if user in POOL, we can give a gift only for users in pool
         if ($wpdb && $wpdb->prefix) {
             $userPool = $wpdb->get_row(
                 $wpdb->prepare(
@@ -512,7 +584,7 @@ function ggUserDataValidation( $data ) {
         // user not found by email
         // $errors['email'] = sprintf(__('User %s not found by email. Select another user.'), $data['firstname']);
         error_log( 'ggUserDataValidation: User does not exist with email:' . var_export($data['email'], 1) );
-    }
+    }*/
 
     if (empty($data['message'])) {
         $errors['message'] = __('Message is empty. Please add a message.');

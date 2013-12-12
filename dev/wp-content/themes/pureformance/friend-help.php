@@ -4,6 +4,9 @@
 // preload information about user which need a help
 $firstname = '';
 $email     = '';
+
+$firstnameReceiver = '';
+$emailReceiver     = '';
 $giftKey   = '';
 if (isset($_GET['key'])) {
     global $wpdb;
@@ -20,8 +23,8 @@ if (isset($_GET['key'])) {
     if ( $row && $row->ID ) {
         $receiver = get_userdata($row->ID);
 
-        $firstname = !empty($receiver->user_nicename) ? $receiver->user_nicename : $receiver->user_login;
-        $email     = $receiver->user_email;
+        $firstnameReceiver = !empty($receiver->display_name) ? $receiver->display_name : $receiver->user_login;
+        $emailReceiver     = $receiver->user_email;
     }
 } else {
     header( 'Location: ' . home_url( '/' ) . 'create-account/' );
@@ -50,18 +53,19 @@ $(document).ready(function(){
                 $headline = get_post_meta($post->ID, 'headline', true);
                 if ($headline == '') { $headline = '<span>PURE</span> Simple, Powerful, Effective, Trusted'; }
             ?>
-            <h1 class="entry-title">Help to <?php echo isset($firstname) ? esc_attr( strtoupper( $firstname ) ) : '' ?><?php //echo $headline?></h1>
+            <h1 class="entry-title">Help to <?php echo isset($firstnameReceiver) ? esc_attr( strtoupper( $firstnameReceiver ) ) : '' ?><?php //echo $headline?></h1>
         </div>
 
         <div class="entry-content">
         <div class="copy">
-            <h2>Help to <?php echo isset($firstname) ? esc_attr( strtoupper( $firstname ) ) : '' ?></h2>
+            <h2>Help to <?php echo isset($firstnameReceiver) ? esc_attr( strtoupper( $firstnameReceiver ) ) : '' ?></h2>
             <p>My friend just gifted me into Pureformance! Who wants to give me a hand, pay it forward and gift them in? Oh, you get access too!</p>
 
-            <p>Create your Account below to proceed!</p>
+            <p>First Create your Account below to proceed!</p>
             <?php the_content(); ?>
             <div>
                 <form method="POST" id="create-account-form" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">
+                    <input type="hidden" name="key" value="<?php echo isset($giftKey) ? esc_attr($giftKey) : '' ?>" />
                 <div style="float:left; width:270px;">
                     <label for="firstname">First Name:</label>
                 </div>
@@ -100,7 +104,7 @@ $(document).ready(function(){
                         <input type="text" class="input-text" name="username" id="username" placeholder="Username or Email" />
                         <input class="input-text" type="password" name="password" id="password" placeholder="Password" />
 
-                        <input type="hidden" name="redirect" value="<?php echo esc_url( home_url( '/' ) . 'give-gift/' ) ?>" />
+                        <input type="hidden" name="redirect" value="<?php echo esc_url( home_url( '/' ) . 'give-gift/?key=' . $giftKey ) ?>" />
 
                         <div class="form-row">
                             <?php global $woocommerce; ?>
@@ -118,7 +122,7 @@ $(document).ready(function(){
                         </div>
                         <div class="form-row">
                             <p>Don't yet have an account? It's fast, free and easy.<br>Join now and start giving.</p>
-                            <center><a href="<?php echo home_url( '/' ); ?>create-account/" class="btn1" style="display:inline-block"><span>Join Now</span></a></center>
+                            <center><a href="<?php echo home_url( '/' ) . 'create-account/?key=' . $giftKey; ?>" class="btn1" style="display:inline-block"><span>Join Now</span></a></center>
 			</div>
                     </form>
                 </div>
