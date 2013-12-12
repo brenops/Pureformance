@@ -1,35 +1,37 @@
 <?php
 // Template Name: Give the Gift
 
-if ( !is_user_logged_in() && !isset($_GET['key']) ) {
+if ( !is_user_logged_in() ) { // && !isset($_GET['key'])
     header( 'Location: ' . home_url( '/' ) . 'create-account/' );
     exit;
 }
 
 // preload from cookies
 
-// preload information about user
+// preload information about user which need a help
 $firstname = '';
 $email     = '';
-if (isset($_GET['key'])) {
+if ( isset($_GET['key']) ) {
     global $wpdb;
-    $gift_key = trim($_GET['key']);
-    $gift_key = preg_replace("/[^a-zA-Z0-9_\s]/", '', $gift_key);
+    $giftKey = trim($_GET['key']);
+    $giftKey = preg_replace("/[^a-zA-Z0-9_\s]/", '', $giftKey);
     // get user from pool by gift key (unique key for user in pool)
     $row = $wpdb->get_row(
         $wpdb->prepare(
             "SELECT ID, status FROM {$wpdb->prefix}users_pool WHERE gift_key = %s AND status = %d",
-            $gift_key,
+            $giftKey,
             0
         )
     );
     if ( $row && $row->ID ) {
         $receiver = get_userdata($row->ID);
 
-        $firstname = !empty($receiver->user_nicename) ? $receiver->user_nicename : $receiver->user_login;
+        $firstname = !empty($receiver->display_name) ? $receiver->display_name : $receiver->user_login;
         $email     = $receiver->user_email;
     }
 }
+
+$isRandom = isset($_GET['random']) ? true : false;
 
 // Add a Gift Membership to cart of current user
 do_action( 'addgifttocart' );
@@ -56,6 +58,27 @@ $(document).ready(function(){
         </div>
 
         <div class="entry-content">
+
+        <?php if ($isRandom) : ?>
+        <div class="copy">
+            <h2>Give the Gift to a Random user</h2>
+            Your friend was already gifted by someone. You can Give a Gift to a Random user or enter a First Name and Email of someone else below.
+        </div>
+        <div class="clear"></div>
+        <div class="copy">
+            <p></p>
+            <div>
+                <form method="POST" id="give-gift-random-form" action="<?php echo esc_url( home_url( '/' ) . 'give-gift/' ); ?>">
+                    <input type="hidden" name="random" value="1" />
+                <div>
+                    <input type="submit" class="btn1" name="giveGift" value="<?php esc_attr_e( 'Give Gift To Random User', 'twentyeleven' ); ?>" />
+                </div>
+                </form>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <?php endif; ?>
+
         <div class="copy">
             <h2>Give the Gift of Opportunity</h2>
             Enter the name and email of someone that you know can benefit from the higher principles and game changing content that Pureformance contains.
@@ -91,10 +114,9 @@ $(document).ready(function(){
                 </form>
             </div>
         </div>
-
         <div class="clear"></div>
-        </div><!-- .entry-content -->
 
+        </div><!-- .entry-content -->
     </div><!-- #post-## -->
 
 </div><!-- #container -->

@@ -16,7 +16,7 @@ function caInit() {
     if ( isset( $_POST['createAccount'] ) ) {
         // register and create temp account
         caAddTempUser();
-    } elseif (isset($_GET['c'])) {
+    } elseif ( isset($_GET['c']) ) {
         // create permanent wp user account
         caAddUser();
     }
@@ -70,12 +70,18 @@ function caAddTempUser() {
     //$passwordconfirm = isset($_POST['passwordconfirm']) ? trim($_POST['passwordconfirm']) : '';
     // [optional] in case if admin added a coupon for the new user (which not exists in db) and the user create an account
     $couponCode = isset($_POST['coupon']) ? trim($_POST['coupon']) : null;
+    $giftKey    = isset($_POST['key']) ? trim($_POST['key']) : null;
 
     // allow only a-zA-Z0-9_
     // $firstname = preg_replace("/[^a-zA-Z0-9_\s]/", '', $firstname);
     if ( !empty($couponCode) ) {
         $couponCode = preg_replace("/[^a-zA-Z0-9_\s]/", '', $couponCode);
     }
+    if ( !empty($giftKey) ) {
+        $giftKey = preg_replace("/[^a-zA-Z0-9_\s]/", '', $giftKey);
+    }
+
+    error_log('caAddTempUser: giftKey:' . var_export($giftKey, 1) );
 
     $data = array(
         'firstname' => $firstname,
@@ -144,7 +150,7 @@ function caAddTempUser() {
                     )
                 );
                 // add user to pool (only once) with status = 0 (user IN POOL)
-                if (!$row) {
+                if ( !$row ) {
                     // generate a key for invite page
                     $gift_key = wp_generate_password( 20, false );
                     $created = time();
@@ -191,10 +197,9 @@ function caAddTempUser() {
             array('%s', '%s', '%s', '%s', '%d')
         );
 
-        wp_mail($email, __('Registration'), "Welcome {$firstname}, Your password: {$password}. For activation go to: " . home_url( '/' ) . '?c=' . $code);
+        wp_mail($email, __('Registration'), "Welcome {$firstname}! For activation go to: " . home_url( '/' ) . 'give-gift/?c=' . $code . ( !empty($giftKey) ? '&key=' . $giftKey : '' ) );
 
         $caOutput = '<p>You have been successfully registered. Check Your Email To Activate Your Account.</p>';
-                //. home_url( '/' ) . '?c=' . $code;
     }
 
     add_filter('the_content', 'caContentFilter');
@@ -243,7 +248,14 @@ function caAddUser() {
     $code = trim($_GET['c']);
     $tempUserExist = null;
 
-    if (!empty($code)) {
+    $giftKey = isset($_GET['key']) ? trim($_GET['key']) : null;
+    if ( !empty($giftKey) ) {
+        $giftKey = preg_replace("/[^a-zA-Z0-9_\s]/", '', $giftKey);
+    }
+
+    error_log('caAddUser: giftKey:' . var_export($giftKey, 1) );
+
+    if ( !empty($code) ) {
         $tempUserExist = $wpdb->get_row(
             $wpdb->prepare(
                 "SELECT ID, user_login, user_email, user_pass FROM {$wpdb->prefix}users_temp WHERE user_activation_key = %s",
@@ -253,7 +265,7 @@ function caAddUser() {
     }
     // , user_coupon
 
-    if ($tempUserExist) {
+    if ( $tempUserExist ) {
 
         $data = array(
             'firstname' => $tempUserExist->user_login,
@@ -363,12 +375,14 @@ function caAddUser() {
         }
     } else {
         $caOutput = '<p>' . __('Incorrect code') . '</p>';
+        error_log('caAddUser: Incorrect code:' . var_export($code, 1) );
     }
 
     add_filter('the_content', 'caContentFilter');
 
     // redirect to Give a Gift page
-    wp_redirect( esc_url( home_url( '/' ) . 'give-gift/' ) );
+    error_log('caAddUser: got to give-gift with giftKey:' . var_export($giftKey, 1) );
+    wp_redirect( esc_url( home_url( '/' ) . 'give-gift/' . ( !empty($giftKey) ? '?key=' . $giftKey : '' ) ) );
     exit;
 
     /*if ( is_user_logged_in() ) {

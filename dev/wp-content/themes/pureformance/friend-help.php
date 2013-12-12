@@ -1,27 +1,34 @@
 <?php
-// Template Name: Create Account
+// Template Name: Friend Help
 
-$firstname = null;
-$email = null;
-// Get coupon code and check
-$couponCode = null;
-if ( isset($_GET['coupon']) ) {
-    $couponCode = trim($_GET['coupon']);
-    $couponCode = preg_replace("/[^a-zA-Z0-9_\s]/", '', $couponCode);
+// preload information about user which need a help
+$firstname = '';
+$email     = '';
 
-    $coupon = new WC_Coupon( $couponCode );
-    if ( $coupon && $coupon->is_valid() && isset($coupon->customer_email) ) {
-        $email = is_array($coupon->customer_email) ? $coupon->customer_email[0] : '';
-    }
-
-    // Add a Membership (product) to cart of current user
-    //do_action( 'addgifttocart' );
-}
-
-$giftKey = '';
+$firstnameReceiver = '';
+$emailReceiver     = '';
+$giftKey   = '';
 if (isset($_GET['key'])) {
+    global $wpdb;
     $giftKey = trim($_GET['key']);
     $giftKey = preg_replace("/[^a-zA-Z0-9_\s]/", '', $giftKey);
+    // get user from pool by gift key (unique key for user in pool)
+    $row = $wpdb->get_row(
+        $wpdb->prepare(
+            "SELECT ID, status FROM {$wpdb->prefix}users_pool WHERE gift_key = %s AND status = %d",
+            $giftKey,
+            0
+        )
+    );
+    if ( $row && $row->ID ) {
+        $receiver = get_userdata($row->ID);
+
+        $firstnameReceiver = !empty($receiver->display_name) ? $receiver->display_name : $receiver->user_login;
+        $emailReceiver     = $receiver->user_email;
+    }
+} else {
+    header( 'Location: ' . home_url( '/' ) . 'create-account/' );
+    exit;
 }
 
 if ( is_user_logged_in() ) {
@@ -32,6 +39,7 @@ if ( is_user_logged_in() ) {
 get_header();
 
 ?>
+<!-- -->
 <script>
 $(document).ready(function(){
 
@@ -45,17 +53,19 @@ $(document).ready(function(){
                 $headline = get_post_meta($post->ID, 'headline', true);
                 if ($headline == '') { $headline = '<span>PURE</span> Simple, Powerful, Effective, Trusted'; }
             ?>
-            <h1 class="entry-title">Create your Account below to proceed!<?php //echo $headline?></h1>
+            <h1 class="entry-title">Help to <?php echo isset($firstnameReceiver) ? esc_attr( strtoupper( $firstnameReceiver ) ) : '' ?><?php //echo $headline?></h1>
         </div>
 
         <div class="entry-content">
         <div class="copy">
-            <h2>Create Account</h2>
+            <h2>Help to <?php echo isset($firstnameReceiver) ? esc_attr( strtoupper( $firstnameReceiver ) ) : '' ?></h2>
+            <p>My friend just gifted me into Pureformance! Who wants to give me a hand, pay it forward and gift them in? Oh, you get access too!</p>
+
+            <p>First Create your Account below to proceed!</p>
             <?php the_content(); ?>
             <div>
                 <form method="POST" id="create-account-form" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">
                     <input type="hidden" name="key" value="<?php echo isset($giftKey) ? esc_attr($giftKey) : '' ?>" />
-                    <input type="hidden" name="coupon" value="<?php echo isset($couponCode) ? esc_attr($couponCode) : '' ?>" />
                 <div style="float:left; width:270px;">
                     <label for="firstname">First Name:</label>
                 </div>
@@ -75,12 +85,6 @@ $(document).ready(function(){
                 <div>
                     <input type="password" class="input-text" name="password" id="ca-password" value="" />
                 </div>
-                <!--<div style="float:left; width:270px;">
-                    <label for="passwordconfirm">Confirm Password:</label>
-                </div>
-                <div>
-                    <input type="password" class="input-text" name="passwordconfirm" id="ca-passwordconfirm" value="" />
-                </div>-->
 
                 <div style="float:left; width:270px;">
                     Already have an account? <a href="#sign-in" id="sign-in-trigger" style="text-decoration:underline;">Sign In</a>
@@ -100,7 +104,7 @@ $(document).ready(function(){
                         <input type="text" class="input-text" name="username" id="username" placeholder="Username or Email" />
                         <input class="input-text" type="password" name="password" id="password" placeholder="Password" />
 
-                        <input type="hidden" name="redirect" value="<?php echo esc_url( home_url( '/' ) . 'give-gift/' . ( !empty($giftKey) ? '?key=' . $giftKey : '' ) ) ?>" />
+                        <input type="hidden" name="redirect" value="<?php echo esc_url( home_url( '/' ) . 'give-gift/?key=' . $giftKey ) ?>" />
 
                         <div class="form-row">
                             <?php global $woocommerce; ?>
@@ -118,7 +122,7 @@ $(document).ready(function(){
                         </div>
                         <div class="form-row">
                             <p>Don't yet have an account? It's fast, free and easy.<br>Join now and start giving.</p>
-                            <center><a href="<?php echo home_url( '/' ); ?>create-account/" class="btn1" style="display:inline-block"><span>Join Now</span></a></center>
+                            <center><a href="<?php echo home_url( '/' ) . 'create-account/?key=' . $giftKey; ?>" class="btn1" style="display:inline-block"><span>Join Now</span></a></center>
 			</div>
                     </form>
                 </div>
