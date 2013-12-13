@@ -21,25 +21,38 @@ $row = $wpdb->get_row(
     )
 );
 
-$is_user_in_pool = (isset($row) && $row->status == 0);
-$giftedCount    = 0;
+$isPool = null; // user who did not give a gift yet (empty or new user)
+
+
+$giftedCount     = 0;
 $gifterFirstname = '';
+$purchaserFirstname = '';
 $giftKey         = '';
 
-if ($row) {
-    // gift key for sharing
-    $giftKey = $row->gift_key;
-    $receiver = get_userdata($userId);
-    $gifterFirstname = !empty($receiver->display_name) ? $receiver->display_name : $receiver->user_login;
-
-    // how many users were gifted
-    $giftedCount = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}gift_history WHERE user_purchaser = {$userId} AND status = 1 AND order_id IS NOT NULL" );
-
-    if ($row->status == 1) {
-        //
+if ( !empty($row) ) {
+    if ( $row->status == 0 ) {
+        // user in POOL (C2) - He gave a Gift
+        $isPool = true;
+        $giftKey = $row->gift_key; // key for share your page
+        $gifter = get_userdata( $userId );
+        $gifterFirstname = !empty($gifter->display_name) ? $gifter->display_name : $gifter->user_login;
+        // how many users were gifted by current user
+        $giftedCount = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}gift_history WHERE user_purchaser = {$userId} AND status = 1 AND order_id IS NOT NULL" );
     }
-
+    if ( $row->status == 1 ) {
+        // user got a Gift from somebody (D2) - somebody gave him a Gift
+        $isPool = false;
+        // get last purchaser
+        $userIdPurchaser = $wpdb->get_var( "SELECT user_purchaser FROM {$wpdb->prefix}gift_history WHERE user_receiver = {$userId} AND status = 1 AND order_id IS NOT NULL ORDER BY updated DESC LIMIT 1" );
+        if ( $userIdPurchaser ) {
+            $purchaser = get_userdata( $userIdPurchaser );
+            $purchaserFirstname = !empty($purchaser->display_name) ? $purchaser->display_name : $purchaser->user_login;
+            // get his giftKey
+            $giftKey = $wpdb->get_var( "SELECT gift_key FROM {$wpdb->prefix}users_pool WHERE ID = {$userIdPurchaser}" );
+        }
+    }
 }
+
 
 $woocommerce->show_messages(); ?>
 
@@ -62,21 +75,10 @@ $woocommerce->show_messages(); ?>
     ?>
 </p>
 
-<p class="myaccount_user">You have gifted <?php echo $giftedCount ?> people so far. <?php echo $giftedCount > 0 ? 'Great work!' : '' ?></p>
-
-<?php if ($is_user_in_pool) : ?>
+<?php if ($isPool == true) : /* User in the POOL - he needs to be promoted by himself */ ?>
 
     <div class="copy">
         <h2>Need help getting out of the pool?</h2>
-
-        <form method="POST" id="create-account-form" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">
-        <div style="float:left; width:400px;">
-            <label for="link">Your Personal Invite link (copy and paste this link to anyone)</label>
-        </div>
-        <div>
-            <input type="text" style="width:380px;" class="input-text" name="link" value="<?php echo home_url( '/' ) . 'friend-help/?key=' . $giftKey ?>" />
-        </div>
-        </form>
     </div>
     <div class="clear"></div>
 
@@ -91,36 +93,31 @@ $woocommerce->show_messages(); ?>
     <div class="clear"></div>
 
     <div class="copy">
-        <p class="myaccount_user">Want to ask someone specifically to gift you out of the pool. Enter their email address below and they
-    will receive some background on your story and can click the link to gift your right into the site!</p>
-    </div>
-    <div class="clear"></div>
+        <p class="myaccount_user">Want to ask someone specifically for access to Pureformance?
+        Send them your custom URL.</p>
 
-    <div class="copy">
-        <form method="POST" id="send-email-form" action="">
-        <div style="float:left; width:270px;">
-            <label for="firstname">First Name:</label>
+        <form method="POST" id="create-account-form" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">
+        <div style="float:left; width:400px;">
+            <label for="link">Your Personal Invite link (copy and paste this link to anyone)</label>
         </div>
         <div>
-            <input type="text" class="input-text" name="firstname" id="ma-firstname" value="" />
-        </div>
-        <div style="float:left; width:270px;">
-            <label for="email">Email:</label>
-        </div>
-        <div>
-            <input type="text" class="input-text" name="email" id="ma-email" value="" />
-        </div>
-        <div>
-            <input type="submit" class="btn1" name="sendEmail" value="<?php esc_attr_e( 'Send Email', 'twentyeleven' ); ?>" />
+            <input type="text" style="width:380px;" class="input-text" name="link" value="<?php echo home_url( '/' ) . 'friend-help/?key=' . $giftKey ?>" />
         </div>
         </form>
     </div>
     <div class="clear"></div>
 
-<?php else : ?>
+    <div class="copy">
+        <p class="myaccount_user">You have gifted <?php echo $giftedCount ?> people so far. <?php echo $giftedCount > 0 ? 'The World is glowing brighter!' : '' ?></p>
+    </div>
+    <div class="clear"></div>
+
+
+<?php elseif ($isPool == false) : /* User not in the POOL, but was there */ ?>
+
 
     <div class="copy">
-        <p class="myaccount_user">You just been gifted into the pool by <?php echo $gifterFirstname ?>. He was kind enough to let you in the pool.
+        <p class="myaccount_user">You just been gifted into the pool by <?php echo $purchaserFirstname ?>. He was kind enough to let you in the pool.
     Help him out by sharing his URL so he can join you in Performance.com as soon as possible!</p>
     </div>
     <div class="clear"></div>
@@ -128,8 +125,7 @@ $woocommerce->show_messages(); ?>
     <div class="copy">
         <form method="POST" id="create-account-form" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">
         <div style="float:left; width:400px;">
-            <label for="link">Use this link to Your personal invite Link to help <?php echo $gifterFirstname ?> find someone
-    to help him into the site (copy and paste this link to anyone)</label>
+            <label for="link">Use this link to help <?php echo $purchaserFirstname ?> find someone into the site (copy and paste this link to anyone)</label>
         </div>
         <div>
             <input type="text" class="input-text" style="width:380px;" name="link" value="<?php echo home_url( '/' ) . 'friend-help/?key=' . $giftKey ?>" />
@@ -137,7 +133,19 @@ $woocommerce->show_messages(); ?>
         </form>
     </div>
     <div class="clear"></div>
+    <div class="copy">
+        <div style="float:left; margin:5px 20px;">
+            <div class="fb-share-button" data-href="<?php echo home_url( '/' ) . 'friend-help/?key=' . $giftKey ?>" data-width="300" data-type="box_count"></div>
+        </div>
+        <div style="float:left; margin:5px 20px;">
+            <a href="https://twitter.com/share" class="twitter-share-button" data-url="<?php echo home_url( '/' ) . 'friend-help/?key=' . $giftKey ?>" data-via="Pureformance" data-lang="en" data-text="Help to <?php echo isset($purchaserFirstname) ? esc_attr( $purchaserFirstname ) : '' ?>" data-count="vertical">Tweet</a>
+        </div>
+    </div>
+    <div class="clear"></div>
 
+<?php endif; ?>
+
+    <h2>Tell Us Who To Give Pureformance To</h2>
     <div class="copy">
         <p class="myaccount_user">Know someone else that would benefit from the gift of opportunity with Pureformance?</p>
 
@@ -168,8 +176,6 @@ $woocommerce->show_messages(); ?>
         </form>
     </div>
     <div class="clear"></div>
-
-<?php endif; ?>
 
 
 <?php do_action( 'woocommerce_before_my_account' ); ?>

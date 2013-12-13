@@ -126,7 +126,7 @@ function caAddTempUser() {
                 'display_name' => $firstname
             ) );
             error_log('caAddTempUser: new user created. user id:' . var_export($userId, 1) );
-            if ($userId) {
+            if ( $userId ) {
                 // get login
                 //$userInfo = get_userdata($userId);
                 //$username = $user_info->user_login;
@@ -172,7 +172,7 @@ function caAddTempUser() {
     }
 
     // @todo put into a function
-    if ($errors) {
+    if ( $errors ) {
         $caOutput = '<div style="color:red;"><ul>';
         foreach ($errors as $error) {
             $caOutput .= '<li>' . $error . '</li>';
@@ -185,7 +185,7 @@ function caAddTempUser() {
     }
 
     // 2. Regular registration temp user account
-    if (empty($couponCode)) {
+    if ( empty($couponCode) ) {
         $code = wp_generate_password(16, false);
         $created = time();
 
@@ -342,7 +342,7 @@ function caAddUser() {
                 unset($tempUserExist);
 
                 // then add entry to POOL
-                if ($userHasCoupon) {
+                if ( $userHasCoupon ) {
                     error_log( 'ggAddProductToCard: coupon is valid, add user to POOL:' . var_export($userHasCoupon, 1) );
                     // add to pool
                     // check if user in POOL

@@ -53,15 +53,16 @@ $(document).ready(function(){
                 $headline = get_post_meta($post->ID, 'headline', true);
                 if ($headline == '') { $headline = '<span>PURE</span> Simple, Powerful, Effective, Trusted'; }
             ?>
-            <h1 class="entry-title">Help to <?php echo isset($firstnameReceiver) ? esc_attr( strtoupper( $firstnameReceiver ) ) : '' ?><?php //echo $headline?></h1>
+            <h1 class="entry-title">The Gift That Matters<?php //echo $headline?></h1>
         </div>
 
         <div class="entry-content">
         <div class="copy">
-            <h2>Help to <?php echo isset($firstnameReceiver) ? esc_attr( strtoupper( $firstnameReceiver ) ) : '' ?></h2>
-            <p>My friend just gifted me into Pureformance! Who wants to give me a hand, pay it forward and gift them in? Oh, you get access too!</p>
+            <h2>Gift <?php echo isset($firstnameReceiver) ? esc_attr( strtoupper( $firstnameReceiver ) ) : '' ?> in!</h2>
+            <p><?php echo isset($firstnameReceiver) ? esc_attr( strtoupper( $firstnameReceiver ) ) : '' ?> gave a friend the gift of one month's membership
+                and is looking for someone to give him the same gift in return so he can join them and gain access to our game changing site</p>
 
-            <p>First Create your Account below to proceed!</p>
+            <p>Get Started</p>
             <?php the_content(); ?>
             <div>
                 <form method="POST" id="create-account-form" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">
