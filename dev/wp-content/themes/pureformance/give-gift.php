@@ -46,7 +46,7 @@ $(document).ready(function(){
 
 });
 </script>
-<div id="content" class="wrapper portal">
+<div id="content" class="wrapper">
 
     <div id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
         <div class="header">

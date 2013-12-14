@@ -267,7 +267,7 @@ input:-moz-placeholder { color:#777; }
 	margin-bottom:8px;
 	text-transform:uppercase;
 }
-#header li.signin .popup input[type=text], #header li.signin .popup input[type=password], #create-account-form .input-text, #sign-in-form .input-text, #give-gift-form .input-text {
+#header li.signin .popup input[type=text], #header li.signin .popup input[type=password], #create-account-form .input-text, #give-gift-form .input-text {
 	color:#737476;
 	font-size:13px;
 	border:1px solid #e4e4e5;
@@ -278,6 +278,7 @@ input:-moz-placeholder { color:#777; }
 	margin-bottom:8px;
 	width:200px;
 }
+#create-account-form .input-text { width: 90%; }
 #header li.signin .popup a.registration, #header li.signin .popup a.lost_password {
 	float:right;
 	background:none;
@@ -1767,31 +1768,29 @@ ul.nav-icons li.active span {
 	-moz-border-radius:4px;
 	border-radius:4px;
 	margin-bottom:8px;
-	width:179px;
+	width:194px;
 }
 .ask-expert-popup input[type=text].subject, .ask-expert-popup textarea { width: 360px; }
-.ask-expert-popup .form-row input { /* float: right; */ }
+.ask-expert-popup .form-row input { float: right; }
 .ask-expert-popup .lost_password {
 	font-size: 11px;
 	float: left;
 }
 .ask-expert-popup p {
 	padding: 0 0 15px;
-	/* text-align: center; */
+	text-align: center;
 	font-size: 14px;
 	line-height: 140%;
 	font-weight: bold;
 }
 .ask-expert-popup p a { color: #0E79EE; }
 .form-row.bottom {
-	background: #000;
-	padding-bottom: 20px;
+	padding-bottom: 0;
 	margin-top:25px;
 }
 .form-row.bottom p {
-	color: #fff;
 	font-size: 17px;
-	font-family: "Interstate Bold","Helvetica",Arial,san-serif;
+	font-family: "Interstate Light","Helvetica",Arial,san-serif;
 }
 #notified .form-row {
 	margin-bottom: 20px;

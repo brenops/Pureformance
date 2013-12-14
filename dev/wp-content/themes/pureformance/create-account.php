@@ -30,27 +30,34 @@ if ( is_user_logged_in() ) {
 }
 
 get_header();
-
 ?>
 <script>
 $(document).ready(function(){
-
+	$('#sign-in-trigger').fancybox({
+		'scrolling'		: 'no', 
+		'titleShow'		: false,
+		'centerOnScroll' : true, 
+		'onClosed'		: function() {
+		    $("#login_error").hide();
+		}
+	});
 });
 </script>
-<div id="content" class="wrapper portal">
+<div id="content" class="wrapper">
 
     <div id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
         <div class="header">
             <?php
                 $headline = get_post_meta($post->ID, 'headline', true);
-                if ($headline == '') { $headline = '<span>PURE</span> Simple, Powerful, Effective, Trusted'; }
+                if ($headline == '') { $headline = 'The Gift That Matters'; }
             ?>
-            <h1 class="entry-title">Create your Account below to proceed!<?php //echo $headline?></h1>
+            <h1 class="entry-title"><?php echo $headline?></h1>
         </div>
 
         <div class="entry-content">
-        <div class="copy">
-            <h2>Create Account</h2>
+        <div class="woocommerce">
+        	<h2>To send a gift, please create a quick account.</h2>
+			<h4>Easy as 1, 2, 3</h4>
             <?php the_content(); ?>
             <div>
                 <form method="POST" id="create-account-form" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">
