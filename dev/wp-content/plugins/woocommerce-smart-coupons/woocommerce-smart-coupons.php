@@ -1608,6 +1608,7 @@ if ( is_woocommerce_active() ) {
                                                                                     jQuery('div#gift-certificate-receiver-form-single').slideToggle(1);
                                                                                     jQuery('div#gift-certificate-receiver-form-multi').slideToggle(1);
                                                                                 });
+                                                                                jQuery('div.gift-certificate-receiver-detail-form').show();
                                                                             });
                                                                         ");
                                                                     ?>
@@ -1619,11 +1620,11 @@ if ( is_woocommerce_active() ) {
                                         <?php } ?>
                                         <div class="gift-certificate-show-form">
                                             <p><?php _e( 'Your order contains store credit. What would you like to do?', 'wc_smart_coupons' ); ?></p>
-                                            <?php echo ggInfoMessage() ?>
+                                            <?php //echo ggInfoMessage() ?>
                                             <ul class="show_hide_list" style="list-style-type: none;">
-                                                <li><input type="radio" id="hide_form" name="is_gift" value="no" /> <label for="hide_form"><?php _e( 'Send store credit to me', 'wc_smart_coupons' ); ?></label></li>
+                                                <?php /* ?><li><input type="radio" id="hide_form" name="is_gift" value="no" /> <label for="hide_form"><?php _e( 'Send store credit to me', 'wc_smart_coupons' ); ?></label></li><?php */ ?>
                                                 <li>
-                                                    <input type="radio" id="show_form" name="is_gift" value="yes" <?php echo ggIsGift() ? 'checked="checked"' : '' ?> /> <label for="show_form"><?php _e( 'Gift store credit to someone else', 'wc_smart_coupons' ); ?></label>
+                                                    <input type="radio" id="show_form" name="is_gift" value="yes" <?php echo ggIsGift() ? 'checked="checked"' : '' ?> /> <label for="show_form"><?php _e( 'Gift store credit to ', 'wc_smart_coupons' ); ?> <?php echo ggReceiverName() ?></label>
                                                     <ul class="single_multi_list" style="list-style-type: none;">
                                                         <li><input type="radio" id="send_to_one" name="sc_send_to" value="one" checked="checked" /> <label for="send_to_one"><?php _e( 'Send to one person', 'wc_smart_coupons' ); ?></label>
                                                         <input type="radio" id="send_to_many" name="sc_send_to" value="many" /> <label for="send_to_many"><?php _e( 'Send to different people', 'wc_smart_coupons' ); ?></label></li>

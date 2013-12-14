@@ -8,10 +8,22 @@ $couponCode = null;
 if ( isset($_GET['coupon']) ) {
     $couponCode = trim($_GET['coupon']);
     $couponCode = preg_replace("/[^a-zA-Z0-9_\s]/", '', $couponCode);
-
     $coupon = new WC_Coupon( $couponCode );
-    if ( $coupon && $coupon->is_valid() && isset($coupon->customer_email) ) {
+
+    if ( $coupon && isset($coupon->customer_email) ) { // $coupon->is_valid()
         $email = is_array($coupon->customer_email) ? $coupon->customer_email[0] : '';
+
+        // search in history
+        global $wpdb;
+        $receiver = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT user_receiver_firstname FROM {$wpdb->prefix}gift_history WHERE user_receiver_email = '%s' AND status = 1 ORDER BY id DESC LIMIT 1",
+                $email
+            )
+        );
+        if ($receiver && $receiver->user_receiver_firstname) {
+            $firstname = $receiver->user_receiver_firstname;
+        }
     }
 
     // Add a Membership (product) to cart of current user
