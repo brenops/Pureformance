@@ -23,6 +23,11 @@ woothemes_queue_update( plugin_basename( __FILE__ ), '05c45f2aa466106a466de4402f
 //
 register_activation_hook ( __FILE__, 'smart_coupon_activate' );
 
+define('MEMBERSHIP_GIFT_EMAIL_RECEIVER_SUBJECT', 'The gift of Purformance');
+define('MEMBERSHIP_GIFT_EMAIL_RECEIVER_TITLE', 'You are pretty special! You have been given the gift of Pureformance.');
+define('MEMBERSHIP_GIFT_EMAIL_PURCHASER_SUBJECT', 'Thank You for Giving The Gift');
+
+
 // Function to have by default auto generation for smart coupon on activation of plugin.
 function smart_coupon_activate() {
     global $wpdb, $blog_id;
@@ -2422,11 +2427,22 @@ if ( is_woocommerce_active() ) {
                 // Start collecting content for e-mail
                 ob_start();
 
-                $subject = __( 'Gift Card sent successfully!', 'wc_smart_coupons' );
+                //$subject = __( 'Gift Card sent successfully!', 'wc_smart_coupons' );
+                // Pureformance subject
+                $subject = MEMBERSHIP_GIFT_EMAIL_PURCHASER_SUBJECT;
 
                 do_action('woocommerce_email_header', $subject);
+                //echo sprintf(__('You have successfully sent %d %s to %s (%s)', 'wc_smart_coupons'), $receiver_count, _n( 'Gift Card', 'Gift Cards', count( $receivers_detail ), 'wc_smart_coupons'), $gift_certificate_receiver_name, implode( ', ', array_unique( $receivers_detail ) ) );
+                ?>
+                <p>Your gift has provided your friend immediate access to Pureformance and our resources and community designed to help us reach our human potential.</p>
 
-                echo sprintf(__('You have successfully sent %d %s to %s (%s)', 'wc_smart_coupons'), $receiver_count, _n( 'Gift Card', 'Gift Cards', count( $receivers_detail ), 'wc_smart_coupons'), $gift_certificate_receiver_name, implode( ', ', array_unique( $receivers_detail ) ) );
+                <p>To jump back to Pureformance and your account,
+                <a href="<?php echo home_url( '/' ); ?>my-account/" style="color: hsl(0, 0%, 45%);">
+                click here
+                </a>.</p>
+
+                <p>To ensure that you continue to receive emails from us, please add <u><b>team@pureformance.com</b></u> to your address book or safe senders list.</p>
+                <?php
 
                 do_action('woocommerce_email_footer');
 
@@ -2452,9 +2468,9 @@ if ( is_woocommerce_active() ) {
 
                 $blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
 
-                                $subject_string = __("Congratulations! You've received a coupon", 'wc_smart_coupons');
+                $subject_string = __("Congratulations! You've received a coupon", 'wc_smart_coupons');
 
-                                $url = ( get_option('permalink_structure') ) ? get_permalink( woocommerce_get_page_id('shop') ) : get_post_type_archive_link('product');
+                $url = ( get_option('permalink_structure') ) ? get_permalink( woocommerce_get_page_id('shop') ) : get_post_type_archive_link('product');
 
                 if ( $discount_type == 'smart_coupon' && $is_gift == 'yes' ) {
                     $gift_certificate_sender_name = trim( $gift_certificate_sender_name );
@@ -2469,71 +2485,69 @@ if ( is_woocommerce_active() ) {
                     $smart_coupon_type = __( 'Store Credit', 'wc_smart_coupons' );
                 }
 
-                                $subject_string = ( get_option( 'smart_coupon_email_subject' ) && get_option( 'smart_coupon_email_subject' ) != '' ) ? __( get_option( 'smart_coupon_email_subject' ), 'wc_smart_coupons' ): $subject_string;
-                $subject_string .= ( !empty( $gift_certificate_sender_name ) ) ? $from . $gift_certificate_sender_name : '';
+                    $subject_string = ( get_option( 'smart_coupon_email_subject' ) && get_option( 'smart_coupon_email_subject' ) != '' ) ? __( get_option( 'smart_coupon_email_subject' ), 'wc_smart_coupons' ): $subject_string;
+                    $subject_string .= ( !empty( $gift_certificate_sender_name ) ) ? $from . $gift_certificate_sender_name : '';
 
-                                $subject = apply_filters( 'woocommerce_email_subject_gift_certificate', sprintf( '[%s] %s', $blogname, $subject_string ) );
+                    // Pureformance subject
+                    $subject = MEMBERSHIP_GIFT_EMAIL_RECEIVER_SUBJECT; //apply_filters( 'woocommerce_email_subject_gift_certificate', sprintf( '[%s] %s', $blogname, $subject_string ) );
 
-                                foreach ( $coupon_title as $email => $coupon ) {
+                    foreach ( $coupon_title as $email => $coupon ) {
+                        $amount = $coupon['amount'];
+                        $coupon_code = $coupon['code'];
 
-                                    $amount = $coupon['amount'];
-                                    $coupon_code = $coupon['code'];
+                        switch ( $discount_type ) {
+                                case 'smart_coupon':
+                                        $email_heading  =  sprintf(__('You have received %s worth %s ', 'wc_smart_coupons'), $smart_coupon_type, woocommerce_price($amount) );
+                                        break;
 
-                                    switch ( $discount_type ) {
+                                case 'fixed_cart':
+                                        $email_heading  =  sprintf(__('You have received a coupon worth %s (on entire purchase) ', 'wc_smart_coupons'), woocommerce_price($amount) );
+                                        break;
 
-                                            case 'smart_coupon':
-                                                    $email_heading  =  sprintf(__('You have received %s worth %s ', 'wc_smart_coupons'), $smart_coupon_type, woocommerce_price($amount) );
-                                                    break;
+                                case 'fixed_product':
+                                        $email_heading  =  sprintf(__('You have received a coupon worth %s (for a product) ', 'wc_smart_coupons'), woocommerce_price($amount) );
+                                        break;
 
-                                            case 'fixed_cart':
-                                                    $email_heading  =  sprintf(__('You have received a coupon worth %s (on entire purchase) ', 'wc_smart_coupons'), woocommerce_price($amount) );
-                                                    break;
+                                case 'percent_product':
+                                        $email_heading  =  sprintf(__('You have received a coupon worth %s%% (for a product) ', 'wc_smart_coupons'), $amount );
+                                        break;
 
-                                            case 'fixed_product':
-                                                    $email_heading  =  sprintf(__('You have received a coupon worth %s (for a product) ', 'wc_smart_coupons'), woocommerce_price($amount) );
-                                                    break;
-
-                                            case 'percent_product':
-                                                    $email_heading  =  sprintf(__('You have received a coupon worth %s%% (for a product) ', 'wc_smart_coupons'), $amount );
-                                                    break;
-
-                                            case 'percent':
-                                                    $email_heading  =  sprintf(__('You have received a coupon worth %s%% (on entire purchase) ', 'wc_smart_coupons'), $amount );
-                                                    break;
-
-                    }
-
-                    if ( empty( $email ) ) {
-                        $email = $gift_certificate_sender_email;
-                    }
-
-                    if ( !empty( $order_id ) ) {
-                        $coupon_receiver_details = get_post_meta( $order_id, 'sc_coupon_receiver_details', true );
-                        if ( !is_array( $coupon_receiver_details ) || empty( $coupon_receiver_details ) ) {
-                            $coupon_receiver_details = array();
+                                case 'percent':
+                                        $email_heading  =  sprintf(__('You have received a coupon worth %s%% (on entire purchase) ', 'wc_smart_coupons'), $amount );
+                                        break;
                         }
-                        $coupon_receiver_details[] = array(
+                        // Pureformance Email title
+                        $email_heading = MEMBERSHIP_GIFT_EMAIL_RECEIVER_TITLE;
+
+                        if ( empty( $email ) ) {
+                            $email = $gift_certificate_sender_email;
+                        }
+
+                        if ( !empty( $order_id ) ) {
+                            $coupon_receiver_details = get_post_meta( $order_id, 'sc_coupon_receiver_details', true );
+                            if ( !is_array( $coupon_receiver_details ) || empty( $coupon_receiver_details ) ) {
+                                $coupon_receiver_details = array();
+                            }
+                            $coupon_receiver_details[] = array(
                                 'code'      => $coupon_code,
                                 'amount'    => $amount,
                                 'email'     => $email,
                                 'message'   => $message_from_sender
                             );
-                        update_post_meta( $order_id, 'sc_coupon_receiver_details', $coupon_receiver_details );
-                                    }
+                            update_post_meta( $order_id, 'sc_coupon_receiver_details', $coupon_receiver_details );
+                        }
 
-                                    // Buffer
-                                    ob_start();
+                        // Buffer
+                        ob_start();
 
-                                    include(apply_filters('woocommerce_gift_certificates_email_template', 'templates/email.php'));
+                        include(apply_filters('woocommerce_gift_certificates_email_template', 'templates/email.php'));
 
 
-                                    // Get contents of the e-mail to be sent
-                                    $message = ob_get_clean();
+                        // Get contents of the e-mail to be sent
+                        $message = ob_get_clean();
 
-                                    woocommerce_mail( $email, $subject, $message );
-
-                                }
-
+                        woocommerce_mail( $email, $subject, $message );
+                    }
             }
 
                         //
