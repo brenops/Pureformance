@@ -55,7 +55,18 @@ if ( !empty($row) ) {
 
 
 $woocommerce->show_messages(); ?>
-
+<script>
+$(document).ready(function() { 
+	$('ul.tabs li a').click(function(){
+		$('ul.tabs li').removeClass('active');
+		$(this).parent().addClass('active');
+		var currentTab = $(this).attr('href');
+		$('.tab-content').hide();
+		$(currentTab).show();
+		return false;
+	}); 
+}); 
+</script>
 <div id="fb-root"></div>
 <script>(function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
@@ -68,132 +79,104 @@ $woocommerce->show_messages(); ?>
 <p class="myaccount_user">
 	<?php
 	printf(
-		__( 'Hello, <strong>%s</strong>. From your account dashboard you can view your recent orders, manage your shipping and billing addresses and <a href="%s">change your password</a>.', 'woocommerce' ),
+		__( 'Hello, <strong>%s</strong>. From your account dashboard you can send direct emails to friends, shout out to
+Facebook and Twitter, see how many gifts you have given, view recent orders, manage your billing and
+shipping information, ask for help, and <a href="%s">change your password</a>.', 'woocommerce' ),
 		$current_user->display_name,
 		get_permalink( woocommerce_get_page_id( 'change_password' ) )
 	);
 	?>
 </p>
 
-<?php do_action( 'woocommerce_before_my_account' ); ?>
+<ul class="tabs">
+	<li class="active"><a href="#gifting">Gifting</a></li>
+	<li><a href="#history">Order History / Billing Info</a></li>
+</ul>
+<div id="gifting" class="tab-content copy">
+	<p class="gifted">You have gifted <strong><?php echo $giftedCount ?></strong> people so far. <?php echo $giftedCount > 0 ? 'Great work!' : '' ?></p>
+	
+	<?php if ($isPool == true) : /* User in the POOL - he needs to be promoted by himself */ ?>
+	
+	    <h2>Need help getting out of the pool?</h2>
+	    <p>Our team at PF is here to help you and your friends gain access as quickly as
+possible. Simply shout out on
+Facebook
+and
+Twitter
+for all of your friends to hear
+about how great your friend was for giving you the Gift, and ask for their help in
+returning the favor to get them into PF, too!</p>
 
-<?php woocommerce_get_template( 'myaccount/my-downloads.php' ); ?>
-
-<?php woocommerce_get_template( 'myaccount/my-orders.php', array( 'order_count' => $order_count ) ); ?>
-
-<?php woocommerce_get_template( 'myaccount/my-address.php' ); ?>
- 
-<p class="myaccount_user">You have gifted <?php echo $giftedCount ?> people so far. <?php echo $giftedCount > 0 ? 'Great work!' : '' ?></p>
-
-<?php if ($isPool == true) : /* User in the POOL - he needs to be promoted by himself */ ?>
-
-    <div class="copy">
-        <h2>Need help getting out of the pool?</h2>
-    </div>
-    <div class="clear"></div>
-
-    <div class="copy">
-        <div style="float:left; margin:5px 20px;">
+        <div style="float:left; margin:5px 20px 50px 0">
             <div class="fb-share-button" data-href="<?php echo home_url( '/' ) . 'friend-help/?key=' . $giftKey ?>" data-width="300" data-type="box_count"></div>
         </div>
-        <div style="float:left; margin:5px 20px;">
+        <div style="float:left; margin:5px 20px 50px 0;">
             <a href="https://twitter.com/share" class="twitter-share-button" data-url="<?php echo home_url( '/' ) . 'friend-help/?key=' . $giftKey ?>" data-via="Pureformance" data-lang="en" data-text="Help to <?php echo isset($gifterFirstname) ? esc_attr( $gifterFirstname ) : '' ?>" data-count="vertical">Tweet</a>
         </div>
-    </div>
-    <div class="clear"></div>
-
-    <div class="copy">
-        <p class="myaccount_user">Want to ask someone specifically for access to Pureformance?
-        Send them your custom URL.</p>
-
-        <form method="POST" id="create-account-form" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">
-        <div style="float:left; width:400px;">
-            <label for="link">Your Personal Invite link (copy and paste this link to anyone)</label>
+        <div style="float:left; ">
+        	<h4>Or your can share your Personal Invite link</h4>
+        	<form method="POST" id="create-account-form" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">
+        		<input type="text" style="width:480px;" class="input-text" name="link" value="<?php echo home_url( '/' ) . 'friend-help/?key=' . $giftKey ?>" />
+        	</form>
         </div>
-        <div>
-            <input type="text" style="width:380px;" class="input-text" name="link" value="<?php echo home_url( '/' ) . 'friend-help/?key=' . $giftKey ?>" />
-        </div>
-        </form>
-    </div>
-    <div class="clear"></div>
 
-    <div class="copy">
-        <p class="myaccount_user">You have gifted <?php echo $giftedCount ?> people so far. <?php echo $giftedCount > 0 ? 'The World is glowing brighter!' : '' ?></p>
-    </div>
-    <div class="clear"></div>
-
-
-<?php elseif ($isPool == false) : /* User not in the POOL, but was there */ ?>
-
-
-    <div class="copy">
-        <p class="myaccount_user">You just been gifted into the pool by <?php echo $purchaserFirstname ?>. He was kind enough to let you in the pool.
-    Help him out by sharing his URL so he can join you in Performance.com as soon as possible!</p>
-    </div>
-    <div class="clear"></div>
-
-    <div class="copy">
-        <form method="POST" id="create-account-form" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">
-        <div style="float:left; width:400px;">
-            <label for="link">Use this link to help <?php echo $purchaserFirstname ?> find someone into the site (copy and paste this link to anyone)</label>
-        </div>
-        <div>
-            <input type="text" class="input-text" style="width:380px;" name="link" value="<?php echo home_url( '/' ) . 'friend-help/?key=' . $giftKey ?>" />
-        </div>
-        </form>
-    </div>
-    <div class="clear"></div>
-    <div class="copy">
-        <div style="float:left; margin:5px 20px;">
+	    <div class="clear"></div>
+	
+	<?php elseif ($isPool == false) : /* User not in the POOL, but was there */ ?>
+	
+	
+	    <p class="myaccount_user">You just been gifted into the pool by <strong><?php echo $purchaserFirstname ?></strong>. He was kind enough to let you in the pool.<br>
+	    Help him out by sharing his URL so he can join you in Performance.com as soon as possible!</p>
+	    </div>
+	    <div class="clear"></div>
+        
+        <div style="float:left; margin:5px 20px 50px 0">
             <div class="fb-share-button" data-href="<?php echo home_url( '/' ) . 'friend-help/?key=' . $giftKey ?>" data-width="300" data-type="box_count"></div>
         </div>
-        <div style="float:left; margin:5px 20px;">
+        <div style="float:left; margin:5px 20px 50px 0;">
             <a href="https://twitter.com/share" class="twitter-share-button" data-url="<?php echo home_url( '/' ) . 'friend-help/?key=' . $giftKey ?>" data-via="Pureformance" data-lang="en" data-text="Help to <?php echo isset($purchaserFirstname) ? esc_attr( $purchaserFirstname ) : '' ?>" data-count="vertical">Tweet</a>
         </div>
-    </div>
-    <div class="clear"></div>
-
-<?php endif; ?>
-
-    <h2>Tell Us Who To Give Pureformance To</h2>
-    <div class="copy">
-        <p class="myaccount_user">Know someone else that would benefit from the gift of opportunity with Pureformance?</p>
-
-        <form method="POST" id="give-gift-form" action="<?php echo esc_url( home_url( '/' ) . 'give-gift/' ); ?>">
-        <div style="float:left; width:270px;">
-            <label for="firstname">First Name:</label>
-        </div>
-        <div>
-            <input type="text" class="input-text" name="firstname" id="ca-firstname" value="" />
-        </div>
-        <div style="float:left; width:270px;">
-            <label for="email">Email:</label>
-        </div>
-        <div>
-            <input type="text" class="input-text" name="email" id="ca-email" value="" />
-        </div>
-
-        <div style="float:left; width:270px;">
-            <label for="message">Custom Message:</label>
-        </div>
-        <div>
-            <textarea class="input-text" rows="10" cols="30" name="message"></textarea>
-        </div>
-
-        <div>
-            <input type="submit" class="btn1" name="giveGift" value="<?php esc_attr_e( 'Give Gift Now', 'twentyeleven' ); ?>" />
-        </div>
+        
+        <div style="float:left;">
+        <form method="POST" id="create-account-form" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">\
+            <h4>Use this link to help <?php echo $purchaserFirstname ?> find someone into the site</h4>
+            <input type="text" class="input-text" style="width:480px;" name="link" value="<?php echo home_url( '/' ) . 'friend-help/?key=' . $giftKey ?>" />
         </form>
-    </div>
-    <div class="clear"></div>
-
-
-<?php do_action( 'woocommerce_before_my_account' ); ?>
-
-<?php //woocommerce_get_template( 'myaccount/my-downloads.php' ); ?>
-
-<?php woocommerce_get_template( 'myaccount/my-orders.php', array( 'order_count' => $order_count ) ); ?>
-
-<?php //woocommerce_get_template( 'myaccount/my-address.php' ); ?>
+        </div>
+	    <div class="clear"></div>
+	
+	<?php endif; ?>
+	
+	    <h2>Tell Us Who To Give Pureformance To</h2>
+	    <div class="copy">
+	        <p class="myaccount_user">Know someone else that would benefit from the gift of opportunity with Pureformance?</p>
+	
+	        <form method="POST" id="give-gift-form" action="<?php echo esc_url( home_url( '/' ) . 'give-gift/' ); ?>">
+	        <div>
+	            <input type="text" class="input-text" name="firstname" id="ca-firstname" value="" placeholder="First Name" />
+	        </div>
+	        <div>
+	            <input type="text" class="input-text" name="email" id="ca-email" value="" placeholder="Email" />
+	        </div>
+	        <div>
+	            <textarea class="input-text" rows="10" cols="30" name="message" placeholder="Message"></textarea>
+	        </div>
+	
+	        <div>
+	            <input type="submit" class="btn1" name="giveGift" value="<?php esc_attr_e( 'Give Gift Now', 'twentyeleven' ); ?>" />
+	        </div>
+	        </form>
+	    </div>
+	    <div class="clear"></div>
+</div>
+<div id="history" class="tab-content" style="display:none">
+	<?php do_action( 'woocommerce_before_my_account' ); ?>
+	
+	<?php woocommerce_get_template( 'myaccount/my-downloads.php' ); ?>
+	
+	<?php woocommerce_get_template( 'myaccount/my-orders.php', array( 'order_count' => $order_count ) ); ?>
+	
+	<?php woocommerce_get_template( 'myaccount/my-address.php' ); ?>
+</div>
 
 <?php do_action( 'woocommerce_after_my_account' ); ?>

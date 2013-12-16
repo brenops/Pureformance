@@ -52,10 +52,33 @@ if ( $order ) : ?>
 	<?php else : ?>
 		<?php
 			//ADD ORDER NOTE IF SUCCESSFULL
-			$order->add_order_note( 'Portal : '.$_SESSION['portal'], 0 );
+			if(isset($_SESSION['portal'])) { $order->add_order_note( 'Portal : '.$_SESSION['portal'], 0 ); }
 		?>
 
+		<?php if($firstname == '') { ?>
 		<p><?php _e( 'Thank you. Your order has been received.', 'woocommerce' ); ?></p>
+		<? } else { ?>
+		<h2>Thank You For Giving the Gift of Opportunity</h2>
+		<p>You just gave <strong><?php echo $firstname; ?></strong> the thoughtful and cool gift of access to our one of kind
+resources and community. This is a great opportunity for them to empower what they do
+in life with You and Pureformance by their side. Use our
+<a href="">Social Media</a>
+tools to get gifted
+in return and gain your access to PF.
+                </p>
+                <p>An email has been sent for him/her to begin enjoying his/her first month of full access,
+courtesy of your kindness. The World is getting brighter!</p>
+
+                <h2>Wow, that felt good ...</h2>
+                <div>
+                    <form method="GET" id="give-gift-form" action="<?php echo esc_url( home_url( '/' ) . 'give-gift/' ); ?>">
+                    <div>
+                        <input type="submit" class="btn1" name="giveGift" value="<?php esc_attr_e( 'Give Another Gift', 'twentyeleven' ); ?>" />
+                    </div>
+                    </form>
+                </div>
+                <div class="clear"></div><br><br>
+        <? } ?>
 
 		<ul class="order_details">
 			<li class="order">
@@ -129,24 +152,7 @@ if ( $order ) : ?>
 							<a href="<?php echo home_url( '/' ); ?>membership/?add-to-cart=557">Join Now</a>
 						</div>
 		<? } ?>
-		<h2>Thank You For Giving the Gift of Opportunity</h2>
-		<p>
-                    Just gave <strong><?php echo $firstname; ?></strong> a chance to better themselves and become a<br />
-                    game changer!<br />
-                    An email has been sent for him to create an account and begin enjoying his first month of content,<br />
-                    courtesy of your kindness.
-                </p>
-
-                <div class="clear"></div>
-
-                <h2>Wow, that felt good ...</h2>
-                <div>
-                    <form method="GET" id="give-gift-form" action="<?php echo esc_url( home_url( '/' ) . 'give-gift/' ); ?>">
-                    <div>
-                        <input type="submit" class="btn1" name="giveGift" value="<?php esc_attr_e( 'Give Another Gift', 'twentyeleven' ); ?>" />
-                    </div>
-                    </form>
-                </div>
+		
 
 		<div class="clear"></div>
 

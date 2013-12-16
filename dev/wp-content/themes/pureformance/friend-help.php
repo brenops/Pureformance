@@ -42,58 +42,63 @@ get_header();
 <!-- -->
 <script>
 $(document).ready(function(){
-
+	$('#sign-in-trigger').fancybox({
+		'scrolling'		: 'no', 
+		'titleShow'		: false,
+		'centerOnScroll' : true, 
+		'onClosed'		: function() {
+		    $("#login_error").hide();
+		}
+	});
 });
 </script>
-<div id="content" class="wrapper portal">
+<div id="content" class="wrapper">
 
     <div id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
         <div class="header">
             <?php
                 $headline = get_post_meta($post->ID, 'headline', true);
-                if ($headline == '') { $headline = '<span>PURE</span> Simple, Powerful, Effective, Trusted'; }
+                if ($headline == '') { $headline = 'The Gift That Matters'; }
             ?>
-            <h1 class="entry-title">The Gift That Matters<?php //echo $headline?></h1>
+            <h1 class="entry-title"><?php echo $headline?></h1>
         </div>
 
         <div class="entry-content">
-        <div class="copy">
+        <div class="woocommerce">
+        	<h2>Welcome to Pureformance</h2>
+            <p><?php echo isset($firstnameReceiver) ? esc_attr( strtoupper( $firstnameReceiver ) ) : '' ?> gave a friend the gift of one month's membership and is looking for
+someone to give him the same gift in return so he can join them and gain
+access to our game changing site.</p>
             <h2>Gift <?php echo isset($firstnameReceiver) ? esc_attr( strtoupper( $firstnameReceiver ) ) : '' ?> in!</h2>
-            <p><?php echo isset($firstnameReceiver) ? esc_attr( strtoupper( $firstnameReceiver ) ) : '' ?> gave a friend the gift of one month's membership
-                and is looking for someone to give him the same gift in return so he can join them and gain access to our game changing site</p>
-
-            <p>Get Started</p>
             <?php the_content(); ?>
-            <div>
-                <form method="POST" id="create-account-form" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">
-                    <input type="hidden" name="key" value="<?php echo isset($giftKey) ? esc_attr($giftKey) : '' ?>" />
-                <div style="float:left; width:270px;">
-                    <label for="firstname">First Name:</label>
-                </div>
-                <div>
-                    <input type="text" class="input-text" name="firstname" id="ca-firstname" value="<?php echo isset($firstname) ? esc_attr($firstname) : '' ?>" />
-                </div>
-                <div style="float:left; width:270px;">
-                    <label for="email">Email:</label>
-                </div>
-                <div>
-                    <input type="text" class="input-text" name="email" id="ca-email" value="<?php echo isset($email) ? esc_attr($email) : '' ?>" />
-                </div>
+            
+            <div class="col2-set">			
+	            <div class="video">
+					<span>Video Goes here</span>
+					<p>What's Inside the Gift?</p>
+				</div>
 
-                <div style="float:left; width:270px;">
-                    <label for="password">Password:</label>
-                </div>
-                <div>
-                    <input type="password" class="input-text" name="password" id="ca-password" value="" />
-                </div>
-
-                <div style="float:left; width:270px;">
-                    Already have an account? <a href="#sign-in" id="sign-in-trigger" style="text-decoration:underline;">Sign In</a>
-                </div>
-                <div>
-                    <input type="submit" class="btn1" name="createAccount" value="<?php esc_attr_e( 'Submit', 'twentyeleven' ); ?>" />
-                </div>
-                </form>
+	            <div class="col-1">
+	                <form method="POST" id="create-account-form" class="register" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>" style="margin-top:0;">
+	                    <input type="hidden" name="key" value="<?php echo isset($giftKey) ? esc_attr($giftKey) : '' ?>" />
+	                <div>
+	                    <input type="text" class="input-text" name="firstname" id="ca-firstname" value="<?php if(isset($firstname)) { echo esc_attr($firstname); } ?>" placeholder="First Name" />
+	                </div>
+	                <div>
+	                    <input type="text" class="input-text" name="email" id="ca-email" value="<?php echo isset($email) ? esc_attr($email) : '' ?>" placeholder="Email" />
+	                </div>
+	                <div>
+	                    <input type="password" class="input-text" name="password" id="ca-password" value="" placeholder="Password" />
+	                </div>
+	
+	                <div style="float:left; width:270px;font-size:12px;">
+	                    Already have an account? <a href="#sign-in" id="sign-in-trigger" style="text-decoration:underline;">Sign In</a>
+	                </div>
+	                <div>
+	                    <input type="submit" class="btn1" name="createAccount" value="<?php esc_attr_e( 'Submit', 'twentyeleven' ); ?>" />
+	                </div>
+	                </form>
+	            </div>
             </div>
         </div>
         <div class="clear"></div>
@@ -133,6 +138,7 @@ $(document).ready(function(){
 
     </div><!-- #post-## -->
 
+	<?php include (TEMPLATEPATH . '/bottom-boxes.php'); ?>
 </div><!-- #container -->
 
 <?php get_footer(); ?>

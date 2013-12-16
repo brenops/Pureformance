@@ -122,7 +122,7 @@
 	        	<li><a href="<?php echo home_url( '/' ); ?>cart/" class="icon">View Cart</a></li>
             	<li><a href="<?=home_url( '/' )?>my-account" class="icon"><?=(is_user_logged_in() ? 'My Account' : 'Sign in')?></a></li>
             	<?php if(is_user_logged_in()){ ?><li><a href="<?php echo wp_logout_url(home_url( '/' )); ?>" class="icon">Sign Out</a></li><? } ?>
-            <?php if ($_SESSION['is_subscriber']==0) {?><li class="membership"><a href="<?=home_url( '/' )?>membership/">Give the Gift</a></li><? } ?>
+            <?php if ($_SESSION['is_subscriber']==0) {?><li class="membership"><a href="<?=home_url( '/' )?>gift/">Give the Gift</a></li><? } ?>
 
 		    </ul>
 	    </div>

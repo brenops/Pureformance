@@ -52,9 +52,9 @@ $(document).ready(function(){
         <div class="header">
             <?php
                 $headline = get_post_meta($post->ID, 'headline', true);
-                if ($headline == '') { $headline = '<span>PURE</span> Simple, Powerful, Effective, Trusted'; }
+                if ($headline == '') { $headline = 'The Gift That Matters'; }
             ?>
-            <h1 class="entry-title">Give the Gift!<?php //echo $headline?></h1>
+            <h1 class="entry-title"><?php echo $headline?></h1>
         </div>
 
         <div class="entry-content">
@@ -62,7 +62,7 @@ $(document).ready(function(){
         <?php if ($isRandom) : ?>
         <div class="copy">
             <h2>Give the Gift to a Random user</h2>
-            Your friend was already gifted by someone. You can Give a Gift to a Random user or enter a First Name and Email of someone else below.
+            <p>Your friend was already gifted by someone. You can Give a Gift to a Random user or enter a First Name and Email of someone else below.</p>
         </div>
         <div class="clear"></div>
         <div class="copy">
@@ -80,32 +80,24 @@ $(document).ready(function(){
         <?php endif; ?>
 
         <div class="copy">
-            <h2>Give the Gift of Opportunity</h2>
-            Enter the name and email of someone that you know can benefit from the higher principles and game changing content that Pureformance contains.
+            <h2>Tell Us Who To Give Pureformance To</h2>
+            <p>Enter the name, email, and message of someone that you know can
+benefit from the higher principles and game changing content <br>that
+Pureformance contains.</p>
         </div>
         <div class="clear"></div>
         <div class="copy">
             <?php the_content(); ?>
             <div>
                 <form method="POST" id="give-gift-form" action="<?php echo esc_url( home_url( '/' ) . 'give-gift/' ); ?>">
-                <div style="float:left; width:270px;">
-                    <label for="firstname">First Name:</label>
+                <div>
+                    <input type="text" class="input-text" name="firstname" id="ca-firstname" value="<?php echo isset($firstname) ? esc_attr($firstname) : '' ?>" placeholder="First Name" />
                 </div>
                 <div>
-                    <input type="text" class="input-text" name="firstname" id="ca-firstname" value="<?php echo isset($firstname) ? esc_attr($firstname) : '' ?>" />
-                </div>
-                <div style="float:left; width:270px;">
-                    <label for="email">Email:</label>
+                    <input type="text" class="input-text" name="email" id="ca-email" value="<?php echo isset($email) ? esc_attr($email) : '' ?>" placeholder="Email" />
                 </div>
                 <div>
-                    <input type="text" class="input-text" name="email" id="ca-email" value="<?php echo isset($email) ? esc_attr($email) : '' ?>" />
-                </div>
-
-                <div style="float:left; width:270px;">
-                    <label for="message">Custom Message:</label>
-                </div>
-                <div>
-                    <textarea class="input-text" rows="10" cols="30" name="message"></textarea>
+                    <textarea class="input-text" rows="10" cols="30" name="message" placeholder="Message"></textarea>
                 </div>
 
                 <div>
