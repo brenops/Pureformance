@@ -59,43 +59,35 @@ $(document).ready(function(){
         	<h2>To send a gift, please create a quick account.</h2>
 			<h4>Easy as 1, 2, 3</h4>
             <?php the_content(); ?>
-            <div>
-                <form method="POST" id="create-account-form" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">
-                    <input type="hidden" name="key" value="<?php echo isset($giftKey) ? esc_attr($giftKey) : '' ?>" />
-                    <input type="hidden" name="coupon" value="<?php echo isset($couponCode) ? esc_attr($couponCode) : '' ?>" />
-                <div style="float:left; width:270px;">
-                    <label for="firstname">First Name:</label>
+            <div class="col2-set">
+	            <div class="col-1">
+	                <form method="POST" id="create-account-form" class="register" action="<?php echo esc_url( home_url( '/' ) . 'create-account/' ); ?>">
+	                    <input type="hidden" name="key" value="<?php echo isset($giftKey) ? esc_attr($giftKey) : '' ?>" />
+	                    <input type="hidden" name="coupon" value="<?php echo isset($couponCode) ? esc_attr($couponCode) : '' ?>" />
+	                <div>
+	                    <input type="text" class="input-text" name="firstname" id="ca-firstname" value="<?php echo isset($firstname) ? esc_attr($firstname) : '' ?>" placeholder="First Name" />
+	                </div>
+	                <div>
+	                    <input type="text" class="input-text" name="email" id="ca-email" value="<?php echo isset($email) ? esc_attr($email) : '' ?>" placeholder="Email Address" />
+	                </div>
+	                <div>
+	                    <input type="password" class="input-text" name="password" id="ca-password" value="" placeholder="Password" />
+	                </div>
+	                <!--<div style="float:left; width:270px;">
+	                    <label for="passwordconfirm">Confirm Password:</label>
+	                </div>
+	                <div>
+	                    <input type="password" class="input-text" name="passwordconfirm" id="ca-passwordconfirm" value="" />
+	                </div>-->
+	
+	                <div style="float:left; width:270px;font-size:12px;">
+	                    Already have an account? <a href="#sign-in" id="sign-in-trigger" style="text-decoration:underline;">Sign In</a>
+	                </div>
+	                <div>
+	                    <input type="submit" class="btn1" name="createAccount" value="<?php esc_attr_e( 'Submit', 'twentyeleven' ); ?>" />
+	                </div>
+	                </form>
                 </div>
-                <div>
-                    <input type="text" class="input-text" name="firstname" id="ca-firstname" value="<?php echo isset($firstname) ? esc_attr($firstname) : '' ?>" />
-                </div>
-                <div style="float:left; width:270px;">
-                    <label for="email">Email:</label>
-                </div>
-                <div>
-                    <input type="text" class="input-text" name="email" id="ca-email" value="<?php echo isset($email) ? esc_attr($email) : '' ?>" />
-                </div>
-
-                <div style="float:left; width:270px;">
-                    <label for="password">Password:</label>
-                </div>
-                <div>
-                    <input type="password" class="input-text" name="password" id="ca-password" value="" />
-                </div>
-                <!--<div style="float:left; width:270px;">
-                    <label for="passwordconfirm">Confirm Password:</label>
-                </div>
-                <div>
-                    <input type="password" class="input-text" name="passwordconfirm" id="ca-passwordconfirm" value="" />
-                </div>-->
-
-                <div style="float:left; width:270px;">
-                    Already have an account? <a href="#sign-in" id="sign-in-trigger" style="text-decoration:underline;">Sign In</a>
-                </div>
-                <div>
-                    <input type="submit" class="btn1" name="createAccount" value="<?php esc_attr_e( 'Submit', 'twentyeleven' ); ?>" />
-                </div>
-                </form>
             </div>
         </div>
         <div class="clear"></div>
@@ -123,7 +115,8 @@ $(document).ready(function(){
                             }
                             ?>"><?php _e( 'Lost Password?', 'woocommerce' ); ?></a>
                         </div>
-                        <div class="form-row">
+                        <div class="clear"></div>
+                        <div class="form-row bottom">
                             <p>Don't yet have an account? It's fast, free and easy.<br>Join now and start giving.</p>
                             <center><a href="<?php echo home_url( '/' ); ?>create-account/" class="btn1" style="display:inline-block"><span>Join Now</span></a></center>
 			</div>

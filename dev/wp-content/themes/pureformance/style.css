@@ -28,6 +28,13 @@ ol, ul {
 }
 a { text-decoration: none; color: #444; }
 
+a, a:hover, a span, a:hover span {
+transition: all 0.3s ease;
+-webkit-transition: all 0.3s ease;
+-moz-transition: all 0.3s ease;
+-o-transition: all 0.3s ease;
+} 
+
 h1, h2, h3, h4 { font-weight:normal; }
 
 header, footer { width: 100%; }
@@ -1941,6 +1948,69 @@ ul.nav-icons li.active span {
 .address address {
 	font-size: 12px;
 	line-height: 16px;
+}
+
+
+/* =Gift Landing page
+-------------------------------------------------------------- */
+.gift-lp .entry-content {
+	padding: 0!important;
+}
+.gift-lp .get-started {
+	display: inline-block;
+	color:#fff;
+	background: #4898F0;
+	font-family:"Interstate Bold", "Helvetica", Arial, san-serif;
+	text-align: center;
+	padding: 15px 30px;
+	text-transform: uppercase;
+	font-size: 1.5em;
+	margin-top:15px;
+	border-bottom: 6px solid #000;
+}
+.gift-lp .get-started span {
+	display: block;
+	font-size: 0.7em;
+	text-transform: none;
+	color:#fff;
+	padding-top:5px;
+}
+.gift-lp .get-started:hover {
+	background: #000;
+	border-bottom: 6px solid #4898F0;
+}
+.gift-lp .what-is {
+	padding: 50px;
+}
+.gift-lp .what-is h1 {
+	margin-bottom: 25px;
+	font-family:"Interstate Bold", "Helvetica", Arial, san-serif;
+	font-size: 2em;
+	text-transform: uppercase;
+}
+.gift-lp .what-is li {
+	background: url("images/checked.png") no-repeat scroll left 2px rgba(0, 0, 0, 0);
+    color: #444;
+    font-size: 1.05em;
+    padding: 0 0 15px 20px;
+}
+.video {
+	width: 220px;
+	float: right;
+	margin-right: 50px; 
+	font-size: 12px;
+}
+.video span {
+	display: block;
+	padding: 80px 0;
+	border: 1px solid #eee;
+	margin-bottom: 10px;
+	text-align: center;
+	font-style: italic;
+}
+.video p {
+	text-align: center!important;
+	font-weight: bold;
 }
 
 /* =Responsive

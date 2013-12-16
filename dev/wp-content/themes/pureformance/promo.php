@@ -7,38 +7,31 @@ $(document).ready(function(){
 
 });
 </script>
-<div id="content" class="wrapper portal">
+<div id="content" class="wrapper gift-lp">
 
     <div id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
         <div class="header">
             <?php
                 $headline = get_post_meta($post->ID, 'headline', true);
-                if ($headline == '') { $headline = '<span>PURE</span> Simple, Powerful, Effective, Trusted'; }
+                if ($headline == '') { $headline = 'The Gift That Matters'; }
             ?>
-            <h1 class="entry-title">Welcome to Pureformance!<?php //echo $headline?></h1>
+            <h1 class="entry-title"><?php echo $headline?></h1>
         </div>
-
         <div class="entry-content">
-            <div class="copy">
-
-                Pureformance is all about ... <br /><br />
-
-                We are introducing a new model of gifting ... <br /><br />
-
-                Watch the video below to learn more ... <br /><br />
-            </div>
-            <div class="clear"></div>
-        </div><!-- .entry-content -->
-        <div class="entry-content">
-            <div class="copy">
-
-                <a href="<?php echo home_url( '/' ); ?>create-account/" class="btn1"><span>Give Gift Now</span></a><br /><br />
-
-                <a href="<?php echo home_url( '/' ); ?>/" style="text-decoration:underline;"><span>Not yet, I'd like to explore the site more</span></a>
-
-            </div>
-            <div class="clear"></div>
-        </div><!-- .entry-content -->
+			<div class="what-is">
+				<h1>What is Pureformance?</h1>
+				<div class="video">
+					<span>Video Goes here</span>
+					<p>What's Inside the Gift?</p>
+				</div>
+				<ul>
+					<li>A place to find resources to help you perform in what you do</li>
+					<li>A place to connect with others who want the most out of life</li>
+					<li>Interviews, videos, articles, and applications for your benefit</li>
+				</ul>
+				<a href="<?php echo home_url( '/' ); ?>create-account/" class="get-started">Get Started<span>I'm ready to Give $5 Gift</span></a>
+			</div>
+		</div>
     </div><!-- #post-## -->
 
 </div><!-- #container -->
