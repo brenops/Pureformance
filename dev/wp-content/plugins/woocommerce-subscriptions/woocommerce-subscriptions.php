@@ -415,7 +415,7 @@ class WC_Subscriptions {
 	 * Workaround the last day of month quirk in PHP's strtotime function.
 	 *
 	 * Adding +1 month to the last day of the month can yield unexpected results with strtotime().
-	 * For example, 
+	 * For example,
 	 * - 30 Jan 2013 + 1 month = 3rd March 2013
 	 * - 28 Feb 2013 + 1 month = 28th March 2013
 	 *

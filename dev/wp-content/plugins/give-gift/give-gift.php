@@ -13,7 +13,7 @@ Author URI:
  * Add a smart coupon for this product
  * Get a product_id and update the constant
  */
-define('MEMBERSHIP_GIFT_PRODUCT_ID', 637);
+define('MEMBERSHIP_GIFT_PRODUCT_ID', 637); // Membership Gift
 define('MEMBERSHIP_PRODUCT_ID', 267); // Membership (monthly)
 
 
@@ -62,16 +62,33 @@ function ggReceiverEmail() {
     $receiverEmail = '';
 
     ggGetLastReceiver();
-    // if already exists (e.g. second try to give a gift) then update receiver data
-    if ($ggReceiver && $ggReceiver->user_receiver) {
-        $receiver = get_userdata($ggReceiver->user_receiver);
-        $receiverEmail = $receiver->user_email;
-    } else if ($ggReceiver && $ggReceiver->user_receiver_email) {
+
+    if ($ggReceiver && $ggReceiver->user_receiver_email) {
         // case when user Gave a Gift to receiver who is not registered yet
         $receiverEmail = $ggReceiver->user_receiver_email;
+    } if ($ggReceiver && $ggReceiver->user_receiver) {
+        $receiver = get_userdata($ggReceiver->user_receiver);
+        $receiverEmail = $receiver->user_email;
     }
 
     return $receiverEmail;
+}
+
+function ggReceiverName() {
+    global $ggReceiver;
+    $receiverName = '';
+
+    ggGetLastReceiver();
+
+    if ($ggReceiver && $ggReceiver->user_receiver_firstname) {
+        // case when user Gave a Gift to receiver who is not registered yet
+        $receiverName = $ggReceiver->user_receiver_firstname;
+    } else if ($ggReceiver && $ggReceiver->user_receiver) {
+        $receiver = get_userdata($ggReceiver->user_receiver);
+        $receiverName = !empty($receiver->display_name) ? $receiver->display_name : $receiver->user_login;
+    }
+
+    return $receiverName;
 }
 
 function ggReceiverMessage() {
@@ -428,8 +445,8 @@ function ggGiveGift( $order_id ) {
                 }
 
                 // 1. send an email to receiver
-                ob_start();
-
+                // use standart email from smart-coupons plugin
+                /*ob_start();
                 //woocommerce_get_template('emails/email-header.php', array( 'email_heading' => $email_heading ));
                 ?>
                 <h2>Somebody has bought a Membership for you.</h2>
@@ -444,9 +461,10 @@ function ggGiveGift( $order_id ) {
                 $receiverMessage = ob_get_clean();
                 $result1 = wp_mail($receiverEmail, __('Pureformance Membership'), $receiverMessage);
                 error_log('send email to receiver:' . var_export($result1, 1) . ' email:' . $receiverEmail . ' message:' . $receiverMessage);
+                */
 
                 // 2. send an email to purchaser
-                ob_start();
+                /*ob_start();
                 //woocommerce_get_template('emails/email-header.php', array( 'email_heading' => $email_heading ));
                 ?>
 
@@ -463,10 +481,7 @@ function ggGiveGift( $order_id ) {
                 $purchaserMessage = ob_get_clean();
                 $result2 = wp_mail($purchaserEmail, __('Pureformance Membership'), $purchaserMessage);
                 error_log('send email to purchaser:' . var_export($result2, 1) . ' email:' . $purchaserEmail . ' message:' . $purchaserMessage);
-
-                if ($result1 && $result2) {
-                    //
-                }
+                */
             } // if ($isGift && !$isMembership) {
 
 
