@@ -1,3 +1,4 @@
+if( /iPad/i.test(navigator.platform) ) { is_ipad = true; }else{ is_ipad=false; }
 $(document).ready(function(){
 
 	resizeHeight();

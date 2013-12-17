@@ -3,7 +3,9 @@
 get_header();
 ?>
 <script>
+if( /iPad/i.test(navigator.platform) ) { is_ipad = true; }else{ is_ipad=false; }
 $(document).ready(function(){
+	if(is_ipad==false) {
 	$('.portal-options li a').hover(function(){
 		$(this).children('.black').fadeOut(400);
 		$(this).children('.color').fadeIn(400);
@@ -11,6 +13,7 @@ $(document).ready(function(){
 		$(this).children('.black').fadeIn(400);
 		$(this).children('.color').fadeOut(400);
 	});
+	}
 });
 </script>
 <div id="content" class="wrapper portal">
