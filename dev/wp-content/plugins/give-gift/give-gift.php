@@ -32,6 +32,7 @@ add_action( 'addgifttocart', 'ggAddProductToCard' );
 // On Give a Gift page check the user in POOL and coupon exists then go to checkout
 add_action( 'giftproceed', 'ggGiftProceed' );
 
+//add_action( 'woocommerce_cart_is_empty', 'ggGiftProceed' );
 
 function ggIsGift() {
     return true;
@@ -111,7 +112,7 @@ function ggReceiverMessage() {
  */
 function ggInit() {
 
-    if (isset($_POST['giveGift'])) {
+    if ( isset( $_POST['giveGift'] ) ) {
 
         if ( !is_user_logged_in() ) {
             // @todo save form fields to cookies
@@ -721,6 +722,9 @@ function ggGiftProceed() {
     $isPool = false;
     $isGotAGift = false;
     $currentUserId = get_current_user_id();
+    $currentUserEmail = null;
+    $currentUser = get_userdata($currentUserId);
+    $currentUserEmail = $currentUser->email;
 
     // check if user in POOL
     $row = $wpdb->get_row(
@@ -729,28 +733,31 @@ function ggGiftProceed() {
             $currentUserId
         )
     );
-    if ($row && $row->status == 0) {
+    if ( $row && $row->status == 0 ) {
         $isPool = true;
     }
 
     error_log( 'ggGiftProceed: isPool:' . var_export($isPool, 1) );
 
-    if (!$isPool) {
+    if ( !$isPool ) {
         return;
     }
 
     // check coupons
     $args = array(
         'numberposts'     => -1,
-        'meta_key'        => '_customer_user',
-        'meta_value'	  => $currentUserId,
+        //'meta_key'        => '_customer_user',
+        //'meta_value'	  => $currentUserId,
+        'meta_key'    => 'customer_email',
+        'meta_value'  => serialize( array( $currentUserEmail ) ),
         'post_type'       => 'shop_order',
         'post_status'     => 'publish'
     );
     $orders = get_posts($args);
 
+    error_log( 'ggGiftProceed: get_posts:' . var_export(count($orders), 1) );
     $couponForMembership = '';
-    if ($orders) {
+    if ( $orders ) {
         foreach ($orders as $or) {
             $order = new WC_Order();
 
@@ -766,6 +773,7 @@ function ggGiftProceed() {
                     if ( isset($coupon_receiver_detail['code'], $coupon_receiver_detail['amount']) ) {
 
                         $couponForMembership = $coupon_receiver_detail['code'];
+                        error_log( 'ggGiftProceed: coupon:' . var_export($couponForMembership, 1) );
 
                         if ( $woocommerce->cart->has_discount( sanitize_text_field( $couponForMembership ) ) ) {
                             error_log( 'ggGiftProceed: has_discount:' . var_export($couponForMembership, 1) );
@@ -776,16 +784,17 @@ function ggGiftProceed() {
                         $woocommerce->cart->add_discount( sanitize_text_field($couponForMembership) );
 
                         $woocommerce->cart->calculate_totals();
-                        break;
-
                         // coupon found and appied
                         $isGotAGift = true;
+                        break;
                     }
                 } // foreach
             }
 
         } // foreach
     }
+
+    error_log( 'ggGiftProceed: isGotAGift:' . var_export($isGotAGift, 1) );
 
     if ( $isGotAGift ) {
         // redirect to Give a Gift page

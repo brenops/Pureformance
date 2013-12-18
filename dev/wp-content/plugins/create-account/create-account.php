@@ -256,6 +256,7 @@ function caAddUser() {
     error_log('caAddUser: giftKey:' . var_export($giftKey, 1) );
 
     if ( !empty($code) ) {
+        $code = preg_replace("/[^a-zA-Z0-9_\s]/", '', $code);
         $tempUserExist = $wpdb->get_row(
             $wpdb->prepare(
                 "SELECT ID, user_login, user_email, user_pass FROM {$wpdb->prefix}users_temp WHERE user_activation_key = %s",
@@ -274,14 +275,14 @@ function caAddUser() {
             //'passwordconfirm' => $tempUserExist->user_pass,
         );
 
-	$errors = caUserDataValidation($data);
+	$errors = caUserDataValidation( $data );
 
-        if ($errors) {
+        if ( $errors ) {
             $caOutput = '<p>' . __('Account already activated') . '</p>';
         } else {
             //$userId = wp_create_user($tempUserExist->user_login, $tempUserExist->user_pass, $tempUserExist->user_email);
 
-            $username = caCreateUsernameFromEmail($tempUserExist->user_email);
+            $username = caCreateUsernameFromEmail( $tempUserExist->user_email );
 
             $userId = wp_insert_user( array (
                 'user_login'   => $username,
@@ -290,7 +291,7 @@ function caAddUser() {
                 'display_name' => $tempUserExist->user_login
             ) );
 
-            if ($userId) {
+            if ( $userId ) {
                 // get login
                 //$userInfo = get_userdata($userId);
                 //$username = $user_info->user_login;
@@ -305,6 +306,7 @@ function caAddUser() {
                     'remember'      => false
                 );
                 $user = wp_signon($credentials, false);
+                error_log('caAddUser: wp_signon:' . var_export($user, 1) );
 
                 // Check Coupon for exists. If someone bought for the user which was not registered.
                 $userHasCoupon = false;
@@ -317,33 +319,37 @@ function caAddUser() {
                 );
 
                 error_log('caAddUser: get coupons with args:' . var_export($args, 1) );
-                $coupons = get_posts($args);
+                $coupons = get_posts( $args );
                 //error_log('caAddUser: coupons:' . var_export($coupons, 1) );
 
                 $couponForMembership = '';
-                if ($coupons) {
-                    foreach ($coupons as $coupon) {
+                woocommerce_empty_cart();
+                if ( $coupons ) {
+                    foreach ( $coupons as $coupon ) {
                         $couponForMembership = $coupon->post_title;
                         error_log('caAddUser: coupon:' . var_export($couponForMembership, 1) );
 
-                        $couponObj = new WC_Coupon($couponForMembership);
-                        error_log( 'ggAddProductToCard: coupon given, check is valid:' . var_export($couponForMembership, 1) );
+                        $couponObj = new WC_Coupon( $couponForMembership );
+                        error_log( 'caAddUser: coupon given, check is valid:' . var_export($couponForMembership, 1) );
 
                         if ( $couponObj->is_valid() ) {
                             $userHasCoupon = true;
-                            error_log( 'ggAddProductToCard: coupon is valid:' . var_export($couponForMembership, 1) );
+                            error_log( 'caAddUser: coupon is valid:' . var_export($couponForMembership, 1) );
                             break;
+                        } else {
+                            error_log( 'caAddUser: coupon is NOT valid:' . var_export($couponForMembership, 1) );
                         }
                     }
                 }
+                error_log( 'caAddUser: userHasCoupon:' . var_export($userHasCoupon, 1) );
 
                 // remove temp entry
                 $wpdb->delete( $wpdb->prefix . 'users_temp', array( 'ID' => $tempUserExist->ID ), array( '%d' ) );
                 unset($tempUserExist);
 
                 // then add entry to POOL
-                if ( $userHasCoupon ) {
-                    error_log( 'ggAddProductToCard: coupon is valid, add user to POOL:' . var_export($userHasCoupon, 1) );
+                if ( $userHasCoupon && !empty($couponForMembership) ) {
+                    error_log( 'caAddUser: coupon is valid, add user to POOL:' . var_export($userHasCoupon, 1) );
                     // add to pool
                     // check if user in POOL
                     $row = $wpdb->get_row(
@@ -364,8 +370,10 @@ function caAddUser() {
                         );
                     }
 
+                    error_log( 'caAddUser: redirect to cart with coupon:' . var_export($couponForMembership, 1) );
                     // @todo redirect to checkout page
                     wp_redirect( esc_url( home_url( '/' ) . 'cart/?coupon=' . $couponForMembership ) );
+                    //wp_redirect( esc_url( home_url( '/' ) . 'checkout/?coupon=' . $couponForMembership ) );
                     exit;
                 }
             } else {
