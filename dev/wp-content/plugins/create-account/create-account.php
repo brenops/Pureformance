@@ -109,6 +109,7 @@ function caAddTempUser() {
         }
 
         // validate coupon
+        woocommerce_empty_cart();
         $coupon = new WC_Coupon( $couponCode );
         if ( !$coupon->is_valid() ) {
             $errors['coupon'] = $coupon->get_error_message();
@@ -197,7 +198,24 @@ function caAddTempUser() {
             array('%s', '%s', '%s', '%s', '%d')
         );
 
-        wp_mail($email, __('Registration'), "Welcome {$firstname}! For activation go to: " . home_url( '/' ) . 'give-gift/?c=' . $code . ( !empty($giftKey) ? '&key=' . $giftKey : '' ) );
+        $subject = __('Confirm Account');
+
+        // 1. send an email to current user
+        ob_start();
+
+        woocommerce_get_template('emails/email-header.php', array( 'email_heading' => $email_heading ));
+        ?>
+        Welcome <?php echo $firstname ?>!
+
+        You are one step closer to giving a gift. To activate your account, please go to:
+        <a href="<?php echo home_url( '/' ) . 'give-gift/?c=' . $code . ( !empty($giftKey) ? '&key=' . $giftKey : '' ) ?>">Pureformance</a>
+
+        <?php
+        //woocommerce_get_template('emails/email-footer.php');
+
+        $message = ob_get_clean();
+
+        wp_mail( $email, $subject, $message );
 
         $caOutput = '<p>You have been successfully registered. Check Your Email To Activate Your Account.</p>';
     }
@@ -209,23 +227,23 @@ function caUserDataValidation($data) {
     $errors = array();
 
     if (empty($data['firstname'])) {
-        $errors['firstname'] = __('Firstname is empty');
+        $errors['firstname'] = __('Please enter your First Name');
     } elseif (mb_strlen($data['firstname']) > 60) {
         $errors['firstname'] = __('Firstname can not be longer than 60 characters');
     }
 
     if (empty($data['email'])) {
-        $errors['email'] = __('Email is empty');
+        $errors['email'] = __('Please enter a valid Email Address');
     } elseif (mb_strlen($data['email']) > 100) {
-        $errors['email'] = __('Email can not be longer than 100 characters');
+        $errors['email'] = __('Email Address can not be longer than 100 characters');
     } else if (!is_email($data['email'])) {
-        $errors['email'] = __('Provided incorrect Email address');
+        $errors['email'] = __('Provided incorrect Email Address');
     } else if (email_exists($data['email'])) {
-        $errors['email'] = __('Email already exists');
+        $errors['email'] = __('Email Address already exists');
     }
 
     if (empty($data['password'])) {
-        $errors['password'] = __('Password is empty');
+        $errors['password'] = __('Please enter your Password');
     } elseif (mb_strlen($data['password']) < 6) {
         $errors['password'] = __('Password must be longer than 5 characters');
     } /*elseif (strcmp($data['password'], $data['passwordconfirm']) != 0) {

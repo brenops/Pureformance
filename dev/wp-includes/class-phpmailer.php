@@ -583,10 +583,14 @@ class PHPMailer {
    * @return bool
    */
   public function Send() {
+error_log('EMAIL SEND Send()');
     try {
       if(!$this->PreSend()) return false;
-      return $this->PostSend();
+      $result = $this->PostSend();
+error_log('EMAIL SEND Send() result:' . var_export($result, 1));
+      return $result;
     } catch (phpmailerException $e) {
+error_log('EMAIL SEND Send() catch' . var_export($e, 1));
 	  $this->SentMIMEMessage = '';
       $this->SetError($e->getMessage());
       if ($this->exceptions) {
@@ -597,9 +601,11 @@ class PHPMailer {
   }
 
   protected function PreSend() {
+error_log('EMAIL SEND PreSend() 0');
     try {
 	  $mailHeader = "";
       if ((count($this->to) + count($this->cc) + count($this->bcc)) < 1) {
+error_log('EMAIL SEND PreSend() 1');
         throw new phpmailerException($this->Lang('provide_address'), self::STOP_CRITICAL);
       }
 
@@ -612,6 +618,7 @@ class PHPMailer {
       $this->SetMessageType();
       //Refuse to send an empty message
       if (empty($this->Body)) {
+error_log('EMAIL SEND PreSend() 2');
         throw new phpmailerException($this->Lang('empty_message'), self::STOP_CRITICAL);
       }
 
@@ -639,6 +646,7 @@ class PHPMailer {
       }
 
       $this->SentMIMEMessage = sprintf("%s%s\r\n\r\n%s",$this->MIMEHeader,$mailHeader,$this->MIMEBody);
+error_log('EMAIL SEND PreSend() true');
       return true;
 
     } catch (phpmailerException $e) {
@@ -646,11 +654,13 @@ class PHPMailer {
       if ($this->exceptions) {
         throw $e;
       }
+error_log('EMAIL SEND PreSend() false');
       return false;
     }
   }
 
   protected function PostSend() {
+error_log('EMAIL SEND PostSend() result:' . var_export($this->Mailer, 1));
     try {
       // Choose the mailer and send through it
       switch($this->Mailer) {
@@ -665,6 +675,7 @@ class PHPMailer {
       }
 
     } catch (phpmailerException $e) {
+error_log('EMAIL SEND PostSend() catch:' . var_export($e, 1));
       $this->SetError($e->getMessage());
       if ($this->exceptions) {
         throw $e;

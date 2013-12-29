@@ -530,6 +530,8 @@ function ggGiveGift( $order_id ) {
                 error_log('send email to receiver:' . var_export($result, 1) . ' email:' . $purchaserEmail . ' message:' . $message);
             }
 
+            //$order->update_status( 'on-hold', __('Money is comming', 'woocommerce') );
+            //--$order->update_status( 'completed', __('Money is comming', 'woocommerce') );
         } // $order->status != 'failed'
     } // if ( $order )
 
@@ -541,17 +543,17 @@ function ggUserDataValidation( $data ) {
     $errors = array();
 
     if (empty($data['firstname'])) {
-        $errors['firstname'] = __('Firstname is empty');
+        $errors['firstname'] = __('Please enter a First Name');
     } elseif (mb_strlen($data['firstname']) > 60) {
         $errors['firstname'] = __('Firstname can not be longer than 60 characters');
     }
 
     if (empty($data['email'])) {
-        $errors['email'] = __('Email is empty');
+        $errors['email'] = __('Please enter a valid Email Address');
     } elseif (mb_strlen($data['email']) > 100) {
-        $errors['email'] = __('Email can not be longer than 100 characters');
+        $errors['email'] = __('Email Address can not be longer than 100 characters');
     } else if (!is_email($data['email'])) {
-        $errors['email'] = __('Provided incorrect Email address');
+        $errors['email'] = __('Provided incorrect Email Address');
     }
 
     // check user != current user
