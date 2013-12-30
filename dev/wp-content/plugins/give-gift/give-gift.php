@@ -13,7 +13,7 @@ Author URI:
  * Add a smart coupon for this product
  * Get a product_id and update the constant
  */
-define('MEMBERSHIP_GIFT_PRODUCT_ID', 637); // Membership Gift
+define('MEMBERSHIP_GIFT_PRODUCT_ID', 919); // Membership Gift // 637
 define('MEMBERSHIP_PRODUCT_ID', 267); // Membership (monthly)
 
 
