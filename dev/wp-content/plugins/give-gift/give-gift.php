@@ -150,6 +150,8 @@ function ggSaveGiftReceiver() {
     error_log('ggSaveGiftReceiver: isRandom:' . var_export($isRandom, 1) );
     // allow only a-z and 0-9
     //$firstname = preg_replace("/[^a-zA-Z0-9_\s]/", '', $firstname);
+    $firstname = htmlspecialchars($firstname);
+    $message = htmlspecialchars($message);
 
     $data = array(
         'firstname' => $firstname,
@@ -604,13 +606,13 @@ function ggUserDataValidation( $data ) {
         error_log( 'ggUserDataValidation: User does not exist with email:' . var_export($data['email'], 1) );
     }*/
 
-    if (empty($data['message'])) {
+    /*if (empty($data['message'])) {
         $errors['message'] = __('Message is empty. Please add a message.');
     } elseif (mb_strlen($data['message']) < 10) {
         $errors['message'] = __('Too short message');
     } elseif (mb_strlen($data['message']) > 1000) {
         $errors['message'] = __('Too long message');
-    }
+    }*/
 
     return $errors;
 }
