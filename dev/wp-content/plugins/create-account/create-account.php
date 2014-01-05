@@ -200,27 +200,38 @@ function caAddTempUser() {
 
         $subject = __('Confirm Account');
 
+        if ( !defined('TEMPLATEPATH') || !defined('STYLESHEETPATH') ) {
+            wp_templating_constants();
+        }
+
         // 1. send an email to current user
         ob_start();
 
-        woocommerce_get_template('emails/email-header.php', array( 'email_heading' => $email_heading ));
+        woocommerce_get_template('emails/email-header.php', array( 'email_heading' => $subject ));
         ?>
         Welcome <?php echo $firstname ?>!
 
-        You are one step closer to giving a gift. To activate your account, please go to:
-        <a href="<?php echo home_url( '/' ) . 'give-gift/?c=' . $code . ( !empty($giftKey) ? '&key=' . $giftKey : '' ) ?>">Pureformance</a>
+        You are one step closer to giving a gift. To activate your account,
+        <a href="<?php echo home_url( '/' ) . 'give-gift/?c=' . $code . ( !empty($giftKey) ? '&key=' . $giftKey : '' ) ?>">click here</a>.
 
         <?php
-        //woocommerce_get_template('emails/email-footer.php');
+        woocommerce_get_template('emails/email-footer.php');
 
         $message = ob_get_clean();
 
+        add_filter( 'wp_mail_content_type', 'set_html_content_type' );
         wp_mail( $email, $subject, $message );
+        // Reset content-type to avoid conflicts -- http://core.trac.wordpress.org/ticket/23578
+        remove_filter( 'wp_mail_content_type', 'set_html_content_type' );
 
         $caOutput = '<p>You have been successfully registered. Check Your Email To Activate Your Account.</p>';
     }
 
     add_filter('the_content', 'caContentFilter');
+}
+
+function set_html_content_type() {
+	return 'text/html';
 }
 
 function caUserDataValidation($data) {

@@ -9,9 +9,9 @@
 <p>We welcome you to explore what we have created for you and what your friend thought is valuable enough for your time and attention.</p>
 
 <p>To jump in to Pureformance and your account,
-    <a href="<?php echo home_url( '/' ); ?>promo-code/?coupon=<?php echo $coupon_code ?>" style="color: hsl(0, 0%, 45%);">
+    <b><a href="<?php echo home_url( '/' ); ?>promo-code/?coupon=<?php echo $coupon_code ?>">
     click here
-    </a>.
+    </a></b>.
 </p>
 <br />
 
