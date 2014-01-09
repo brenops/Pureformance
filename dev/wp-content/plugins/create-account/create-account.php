@@ -166,7 +166,8 @@ function caAddTempUser() {
                 }
 
                 // @todo redirect to checkout page
-                wp_redirect( esc_url( home_url( '/' ) . 'cart/?coupon=' . $couponCode ) );
+                //wp_redirect( esc_url( home_url( '/' ) . 'cart/?coupon=' . $couponCode ) );
+                wp_redirect( esc_url( home_url( '/' ) . 'take-gift/?coupon=' . $couponCode ) );
                 exit;
 
             } else {
@@ -404,7 +405,8 @@ function caAddUser() {
 
                     error_log( 'caAddUser: redirect to cart with coupon:' . var_export($couponForMembership, 1) );
                     // @todo redirect to checkout page
-                    wp_redirect( esc_url( home_url( '/' ) . 'cart/?coupon=' . $couponForMembership ) );
+                    //wp_redirect( esc_url( home_url( '/' ) . 'cart/?coupon=' . $couponForMembership ) );
+                    wp_redirect( esc_url( home_url( '/' ) . 'take-gift/?coupon=' . $couponForMembership ) );
                     //wp_redirect( esc_url( home_url( '/' ) . 'checkout/?coupon=' . $couponForMembership ) );
                     exit;
                 }
