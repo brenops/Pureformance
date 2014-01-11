@@ -13,7 +13,7 @@ Author URI:
  * Add a smart coupon for this product
  * Get a product_id and update the constant
  */
-define('MEMBERSHIP_GIFT_PRODUCT_ID', 637); // Membership Gift
+define('MEMBERSHIP_GIFT_PRODUCT_ID', 637); // Membership Gift // 919, 637
 define('MEMBERSHIP_PRODUCT_ID', 267); // Membership (monthly)
 
 
@@ -32,6 +32,7 @@ add_action( 'addgifttocart', 'ggAddProductToCard' );
 // On Give a Gift page check the user in POOL and coupon exists then go to checkout
 add_action( 'giftproceed', 'ggGiftProceed' );
 
+//add_action( 'woocommerce_cart_is_empty', 'ggGiftProceed' );
 
 function ggIsGift() {
     return true;
@@ -111,7 +112,7 @@ function ggReceiverMessage() {
  */
 function ggInit() {
 
-    if (isset($_POST['giveGift'])) {
+    if ( isset( $_POST['giveGift'] ) ) {
 
         if ( !is_user_logged_in() ) {
             // @todo save form fields to cookies
@@ -149,6 +150,8 @@ function ggSaveGiftReceiver() {
     error_log('ggSaveGiftReceiver: isRandom:' . var_export($isRandom, 1) );
     // allow only a-z and 0-9
     //$firstname = preg_replace("/[^a-zA-Z0-9_\s]/", '', $firstname);
+    $firstname = htmlspecialchars($firstname);
+    $message = htmlspecialchars($message);
 
     $data = array(
         'firstname' => $firstname,
@@ -529,6 +532,8 @@ function ggGiveGift( $order_id ) {
                 error_log('send email to receiver:' . var_export($result, 1) . ' email:' . $purchaserEmail . ' message:' . $message);
             }
 
+            //$order->update_status( 'on-hold', __('Money is comming', 'woocommerce') );
+            //--$order->update_status( 'completed', __('Money is comming', 'woocommerce') );
         } // $order->status != 'failed'
     } // if ( $order )
 
@@ -540,17 +545,17 @@ function ggUserDataValidation( $data ) {
     $errors = array();
 
     if (empty($data['firstname'])) {
-        $errors['firstname'] = __('Firstname is empty');
+        $errors['firstname'] = __('Please enter a First Name');
     } elseif (mb_strlen($data['firstname']) > 60) {
         $errors['firstname'] = __('Firstname can not be longer than 60 characters');
     }
 
     if (empty($data['email'])) {
-        $errors['email'] = __('Email is empty');
+        $errors['email'] = __('Please enter a valid Email Address');
     } elseif (mb_strlen($data['email']) > 100) {
-        $errors['email'] = __('Email can not be longer than 100 characters');
+        $errors['email'] = __('Email Address can not be longer than 100 characters');
     } else if (!is_email($data['email'])) {
-        $errors['email'] = __('Provided incorrect Email address');
+        $errors['email'] = __('Provided incorrect Email Address');
     }
 
     // check user != current user
@@ -601,13 +606,13 @@ function ggUserDataValidation( $data ) {
         error_log( 'ggUserDataValidation: User does not exist with email:' . var_export($data['email'], 1) );
     }*/
 
-    if (empty($data['message'])) {
+    /*if (empty($data['message'])) {
         $errors['message'] = __('Message is empty. Please add a message.');
     } elseif (mb_strlen($data['message']) < 10) {
         $errors['message'] = __('Too short message');
     } elseif (mb_strlen($data['message']) > 1000) {
         $errors['message'] = __('Too long message');
-    }
+    }*/
 
     return $errors;
 }
@@ -721,6 +726,9 @@ function ggGiftProceed() {
     $isPool = false;
     $isGotAGift = false;
     $currentUserId = get_current_user_id();
+    $currentUserEmail = null;
+    $currentUser = get_userdata($currentUserId);
+    $currentUserEmail = $currentUser->email;
 
     // check if user in POOL
     $row = $wpdb->get_row(
@@ -729,28 +737,31 @@ function ggGiftProceed() {
             $currentUserId
         )
     );
-    if ($row && $row->status == 0) {
+    if ( $row && $row->status == 0 ) {
         $isPool = true;
     }
 
     error_log( 'ggGiftProceed: isPool:' . var_export($isPool, 1) );
 
-    if (!$isPool) {
+    if ( !$isPool ) {
         return;
     }
 
     // check coupons
     $args = array(
         'numberposts'     => -1,
-        'meta_key'        => '_customer_user',
-        'meta_value'	  => $currentUserId,
+        //'meta_key'        => '_customer_user',
+        //'meta_value'	  => $currentUserId,
+        'meta_key'    => 'customer_email',
+        'meta_value'  => serialize( array( $currentUserEmail ) ),
         'post_type'       => 'shop_order',
         'post_status'     => 'publish'
     );
     $orders = get_posts($args);
 
+    error_log( 'ggGiftProceed: get_posts:' . var_export(count($orders), 1) );
     $couponForMembership = '';
-    if ($orders) {
+    if ( $orders ) {
         foreach ($orders as $or) {
             $order = new WC_Order();
 
@@ -766,6 +777,7 @@ function ggGiftProceed() {
                     if ( isset($coupon_receiver_detail['code'], $coupon_receiver_detail['amount']) ) {
 
                         $couponForMembership = $coupon_receiver_detail['code'];
+                        error_log( 'ggGiftProceed: coupon:' . var_export($couponForMembership, 1) );
 
                         if ( $woocommerce->cart->has_discount( sanitize_text_field( $couponForMembership ) ) ) {
                             error_log( 'ggGiftProceed: has_discount:' . var_export($couponForMembership, 1) );
@@ -776,16 +788,17 @@ function ggGiftProceed() {
                         $woocommerce->cart->add_discount( sanitize_text_field($couponForMembership) );
 
                         $woocommerce->cart->calculate_totals();
-                        break;
-
                         // coupon found and appied
                         $isGotAGift = true;
+                        break;
                     }
                 } // foreach
             }
 
         } // foreach
     }
+
+    error_log( 'ggGiftProceed: isGotAGift:' . var_export($isGotAGift, 1) );
 
     if ( $isGotAGift ) {
         // redirect to Give a Gift page
