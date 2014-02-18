@@ -171,7 +171,7 @@ class WC_Subscriptions {
 
 			self::remove_subscriptions_from_cart();
 
-			$woocommerce->add_error( __( 'A subscription has been removed from your cart. Due to payment gateway restrictions, products and subscriptions can not be purchased at the same time.', self::$text_domain ) );
+			$woocommerce->add_error( __( 'Please purchase your subscription first then proceed to products or guidebooks. Products and subscriptions cannot be purchased at the same time.', self::$text_domain ) );
 			$woocommerce->set_messages();
 
 			// Redirect to cart page to remove subscription & notify shopper
