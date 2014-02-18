@@ -13,7 +13,7 @@ Author URI:
  * Add a smart coupon for this product
  * Get a product_id and update the constant
  */
-define('MEMBERSHIP_GIFT_PRODUCT_ID', 637); // Membership Gift // 919, 637
+define('MEMBERSHIP_GIFT_PRODUCT_ID', 919); // Membership Gift // 919, 637
 define('MEMBERSHIP_PRODUCT_ID', 267); // Membership (monthly)
 
 
@@ -647,9 +647,14 @@ function ggAddProductToCard( $product_id ) {
 
             error_log( 'ggAddProductToCard: coupon given, check is valid:' . var_export($couponCode, 1) );
 
-            if ( !$coupon->is_valid() ) {
+            if ( !checkCoupon( $coupon ) ) {
+                error_log('ggAddProductToCard: coupon is NOT valid (expired or used)' );
+                $coupon->is_valid();
+                $errors = $coupon->get_error_message();
+                error_log('ggAddProductToCard: coupon is NOT valid:' . var_export($errors, 1) );
                 return;
             }
+
             error_log( 'ggAddProductToCard: coupon is valid:' . var_export($couponCode, 1) );
 
             $productId = MEMBERSHIP_PRODUCT_ID; // Membership (monthly)

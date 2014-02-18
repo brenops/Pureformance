@@ -111,8 +111,11 @@ function caAddTempUser() {
         // validate coupon
         woocommerce_empty_cart();
         $coupon = new WC_Coupon( $couponCode );
-        if ( !$coupon->is_valid() ) {
+        if ( !checkCoupon( $coupon ) ) {
+            error_log('caAddTempUser: coupon is NOT valid (expired or used)' );
+            $coupon->is_valid();
             $errors['coupon'] = $coupon->get_error_message();
+            error_log('caAddTempUser: coupon is NOT valid:' . var_export($errors['coupon'], 1) );
         } else {
             error_log('caAddTempUser: coupon is valid:' . var_export($couponCode, 1) );
             // Create new permanent wp user (only if the user has an invite from admin (coupon)
@@ -163,7 +166,8 @@ function caAddTempUser() {
                 }
 
                 // @todo redirect to checkout page
-                wp_redirect( esc_url( home_url( '/' ) . 'cart/?coupon=' . $couponCode ) );
+                //wp_redirect( esc_url( home_url( '/' ) . 'cart/?coupon=' . $couponCode ) );
+                wp_redirect( esc_url( home_url( '/' ) . 'take-gift/?coupon=' . $couponCode ) );
                 exit;
 
             } else {
@@ -401,7 +405,8 @@ function caAddUser() {
 
                     error_log( 'caAddUser: redirect to cart with coupon:' . var_export($couponForMembership, 1) );
                     // @todo redirect to checkout page
-                    wp_redirect( esc_url( home_url( '/' ) . 'cart/?coupon=' . $couponForMembership ) );
+                    //wp_redirect( esc_url( home_url( '/' ) . 'cart/?coupon=' . $couponForMembership ) );
+                    wp_redirect( esc_url( home_url( '/' ) . 'take-gift/?coupon=' . $couponForMembership ) );
                     //wp_redirect( esc_url( home_url( '/' ) . 'checkout/?coupon=' . $couponForMembership ) );
                     exit;
                 }
@@ -456,6 +461,24 @@ function caCreateUsernameFromEmail( $email ) {
     }
 
     return $username;
+}
+
+function checkCoupon( $coupon ) {
+    $valid = true;
+
+    if ( $coupon->expiry_date ) {
+        if ( current_time( 'timestamp' ) > $coupon->expiry_date ) {
+            $valid = false;
+        }
+    }
+
+    if ( $coupon->usage_limit > 0 ) {
+        if ( $coupon->usage_count >= $coupon->usage_limit ) {
+            $valid = false;
+        }
+    }
+
+    return $valid;
 }
 
 function caContentFilter($content) {
